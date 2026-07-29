@@ -110,7 +110,7 @@
   <div class="filters" id="topicFilters"></div>
   <div class="filters" id="diffFilters"></div>
   <div class="bar">
-    <div>Question <b id="pos">1</b> of <b id="total">0</b></div>
+    <div>Question <b id="pos">1</b> of <b id="total">0</b> &nbsp;&middot;&nbsp; <span id="liveScore">Score: 0 / 0</span></div>
     <div><button id="reportBtn" style="border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;">Progress report</button></div>
   </div>
   <div class="card">
@@ -717,7 +717,7 @@ function render(){
   ["h1Box","h2Box","ansBox"].forEach(b=>el(b).classList.remove("show"));
   el("h1Btn").disabled=false; el("h2Btn").disabled=true; el("ansBtn").disabled=false;
   el("cheer").classList.remove("show");
-  renderChoices();
+  renderChoices(); updateScore();
   if(picks[order[idx]]!==undefined){ el("ansBox").classList.add("show"); el("ansBtn").disabled=true; }
   el("prevBtn").disabled = idx===0;
   el("nextBtn").disabled = idx>=order.length-1;
@@ -727,9 +727,14 @@ el("h1Btn").onclick = ()=>{ el("h1Box").classList.add("show"); el("h1Btn").disab
 el("h2Btn").onclick = ()=>{ el("h2Box").classList.add("show"); el("h2Btn").disabled=true; };
 el("ansBtn").onclick = ()=>{
   const qi = order[idx];
-  if(picks[qi]===undefined){ picks[qi] = -1; scores[qi] = 0; cheerFor(0); renderChoices(); }
+  if(picks[qi]===undefined){ picks[qi] = -1; scores[qi] = 0; cheerFor(0); renderChoices(); updateScore(); }
   el("ansBox").classList.add("show"); el("ansBtn").disabled=true;
 };
+function updateScore(){
+  const done = Object.keys(scores).length;
+  const right = Object.values(scores).filter(s=>s===2).length;
+  el("liveScore").innerHTML = "Score: <b>" + right + " / " + done + "</b>" + (done? " (" + Math.round(100*right/done) + "%)" : "");
+}
 function renderChoices(){
   const qi = order[idx], q = QUESTIONS[qi], div = el("choices");
   div.innerHTML = "";
@@ -751,7 +756,7 @@ function renderChoices(){
         scores[qi] = ok ? 2 : 0;
         cheerFor(ok ? 2 : 0);
         el("ansBox").classList.add("show"); el("ansBtn").disabled=true;
-        renderChoices();
+        renderChoices(); updateScore();
       };
     }
     div.appendChild(b);
