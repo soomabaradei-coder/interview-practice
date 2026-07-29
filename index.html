@@ -68,6 +68,13 @@
   #report th{background:#eef1f6;}
   .foot{margin-top:26px; font-size:.8rem; color:var(--muted); font-family:Helvetica,Arial,sans-serif; text-align:center;}
   sub,sup{line-height:0;}
+  .choice{display:block;width:100%;text-align:left;margin:8px 0 0;padding:11px 14px;border:1px solid var(--line);
+    border-radius:8px;background:#fff;cursor:pointer;font-size:.95rem;font-family:Georgia,serif;line-height:1.45;}
+  .choice:hover:not(:disabled){border-color:var(--accent);background:#f6faf8;}
+  .choice.right{background:#e6f4ea;border-color:var(--easy);}
+  .choice.wrong{background:#fdecea;border-color:var(--hard);}
+  .choice:disabled{cursor:default;opacity:1;}
+  #choices{margin-bottom:16px;}
   #welcome{position:fixed; inset:0; background:rgba(10,20,16,.55); display:flex;
     align-items:center; justify-content:center; z-index:10;}
   #welcome.hide{display:none;}
@@ -109,6 +116,7 @@
   <div class="card">
     <div class="tags"><span class="tag" id="tTopic"></span><span class="tag" id="tDiff"></span></div>
     <div class="q" id="qText"></div>
+    <div id="choices"></div>
     <div class="btns">
       <button class="bh" id="h1Btn">Hint 1</button>
       <button class="bh" id="h2Btn" disabled>Hint 2</button>
@@ -117,12 +125,6 @@
     <div class="box hintbox" id="h1Box"><div class="lbl">Hint 1</div><div id="h1Text"></div></div>
     <div class="box hintbox" id="h2Box"><div class="lbl">Hint 2</div><div id="h2Text"></div></div>
     <div class="box ansbox" id="ansBox"><div class="lbl">Model answer</div><div id="ansText"></div></div>
-    <div class="grade" id="gradeRow">
-      <span>How did you do?</span>
-      <button class="gr" data-g="2">Got it</button>
-      <button class="gp" data-g="1">Partially</button>
-      <button class="gw" data-g="0">Missed it</button>
-    </div>
     <div id="cheer"></div>
   </div>
   <div class="nav">
@@ -131,7 +133,7 @@
     <button id="nextBtn">Next &rarr;</button>
   </div>
   <div id="report" class="card"></div>
-  <div class="foot">Work each problem on paper and explain your reasoning aloud before revealing the answer &mdash; that is what the interview tests.</div>
+  <div class="foot">Work each problem on paper before choosing an answer &mdash; in the real interview you must explain your reasoning aloud.</div>
 </div>
 <script>
 const TOPICS = {calc:"Calculus", la:"Linear Algebra", prob:"Probability", dsa:"Data Structures & Algorithms", os:"Operating Systems"};
@@ -542,11 +544,121 @@ a:"The CPU runs applications in user mode, where privileged instructions and dir
 h1:"Consider the interleaving where each thread acquires its first lock before either takes its second.",
 h2:"One fix changes the order of acquisition; the other abandons waiting forever.",
 a:"Interleaving: T1 takes A; T2 takes B; now T1 blocks waiting for B (held by T2) and T2 blocks waiting for A (held by T1) &mdash; a circular wait with hold-and-wait, no preemption, and mutual exclusion: deadlock. Fix 1 (lock ordering): impose a global order, e.g. always acquire A before B; then a thread holding B can never wait for A, so no cycle can form. Fix 2 (no indefinite wait): use trylock &mdash; if the second lock is unavailable, release the first and retry (ideally with randomized backoff to avoid livelock). Other options: acquire both atomically under a single outer lock, or use deadlock detection and recovery."},
-/*__QUESTIONS__*/
 ];
+// One entry per question, same order. o = 3 options, k = index of correct option (display order is shuffled).
+const CHOICES = [
+// Calculus
+{o:["x&sup2;e<sup>2x</sup>(3 + 2x)","3x&sup2;e<sup>2x</sup>","x&sup2;e<sup>2x</sup>(3 + x)"],k:0},
+{o:["x sin(x) + cos(x) + C","x sin(x) &minus; cos(x) + C","&minus;x sin(x) + cos(x) + C"],k:0},
+{o:["f(x) = x&sup2; at x = 0","f(x) = |x| at x = 0","f(x) = 1/x at x = 0"],k:1},
+{o:["It diverges to &infin;","It converges to 2","It converges to 3"],k:1},
+{o:["2","3","3/2"],k:0},
+{o:["|r| &lt; 1, sum 1/(1 &minus; r)","|r| &le; 1, sum 1/(1 &minus; r)","r &lt; 1, sum r/(1 &minus; r)"],k:0},
+{o:["Local max at x = 1, local min at x = 3","Local min at x = 1, local max at x = 3","Only a local min at x = 3"],k:0},
+{o:["0","1/2","1"],k:1},
+{o:["(8, 7)","(7, 8)","(2, 4)"],k:0},
+{o:["&Sigma;1/n&sup2; converges; &Sigma;1/n diverges","Both converge","Both diverge"],k:0},
+{o:["(1/2)e<sup>x&sup2;</sup> + C and (x &minus; 1)e<sup>x</sup> + C","e<sup>x&sup2;</sup> + C and xe<sup>x</sup> + C","(1/2)e<sup>x&sup2;</sup> + C and (x + 1)e<sup>x</sup> + C"],k:0},
+{o:["&minus;4/5","4/5","&minus;5/4"],k:0},
+{o:["4 &times; 4 &times; 2 m","2 &times; 2 &times; 8 m","8 &times; 8 &times; 0.5 m"],k:0},
+{o:["R = 1","R = 0","R = &infin;"],k:0},
+{o:["Min at (1, 0), saddle at (&minus;1, 0)","Minima at both (&plusmn;1, 0)","Max at (1, 0), min at (&minus;1, 0)"],k:0},
+{o:["&pi;(1 &minus; e<sup>&minus;R&sup2;</sup>), tending to &pi;","2&pi;(1 &minus; e<sup>&minus;R</sup>), tending to 2&pi;","&pi;e<sup>&minus;R&sup2;</sup>, tending to 0"],k:0},
+{o:["4, at (2, 2) and (&minus;2, &minus;2)","8, at (2, 2)","2&radic;2, at (&radic;2, &radic;2)"],k:0},
+{o:["Conditionally convergent","Absolutely convergent","Divergent"],k:0},
+{o:["Four terms (through x&sup3;/3!)","Two terms (1 + x)","Eight terms"],k:0},
+{o:["Part 1: F(x) = &int;<sub>a</sub><sup>x</sup>f(t)dt has F&prime; = f. Part 2: &int;<sub>a</sub><sup>b</sup>f = F(b) &minus; F(a) for any antiderivative F","d/dx &int;<sub>a</sub><sup>b</sup>f(x)dx = f(x) for fixed a and b","Integration and differentiation are inverses only for polynomials"],k:0},
+// Linear Algebra
+{o:["x = 2, y = 3","x = 3, y = 2","x = 1, y = 4"],k:0},
+{o:["det(A) &ne; 0, full rank, and null space = {0}","det(A) = 0 with independent columns","trace(A) &ne; 0 and A symmetric"],k:0},
+{o:["det = 1; A<sup>&minus;1</sup> = [[3, &minus;1], [&minus;5, 2]]","det = 1; A<sup>&minus;1</sup> = [[2, &minus;1], [&minus;5, 3]]","det = 11; A<sup>&minus;1</sup> = (1/11)[[3, &minus;1], [&minus;5, 2]]"],k:0},
+{o:["A nonzero v with Av = &lambda;v &mdash; A only scales v","Any v satisfying Av = 0","A vector that A rotates by 90&deg;"],k:0},
+{o:["Dependent; they span the line t(1, 2)","Independent; they span R&sup2;","Dependent; they span all of R&sup2;"],k:0},
+{o:["Only the line y = x","Both y = x and y = x + 1","All three"],k:0},
+{o:["&lambda; = 1 and 3, eigenvectors (1, &minus;1) and (1, 1)","&lambda; = 2 and 2, eigenvector (1, 0)","&lambda; = &minus;1 and 3, eigenvectors (1, 1) and (1, &minus;1)"],k:0},
+{o:["Infinitely many: the line (&minus;5 + 2t, 11 &minus; 3t, t)","Unique solution (1, 2, 3)","No solution &mdash; inconsistent"],k:0},
+{o:["3","1","2"],k:0},
+{o:["Only 0 and 1","Only &plusmn;1","Any real number"],k:0},
+{o:["Unique iff k &ne; 4; infinitely many if k = 4; never inconsistent","Unique for every k","No solution when k = 4"],k:0},
+{o:["(2<sup>100</sup>, 3<sup>100</sup>)","(200, 300)","(5<sup>100</sup>, 5<sup>100</sup>)"],k:0},
+{o:["N(A) &perp; row space; N(A<sup>T</sup>) &perp; column space","N(A) &perp; column space; N(A<sup>T</sup>) &perp; row space","All four are mutually orthogonal"],k:0},
+{o:["They are always linearly independent","They are always orthogonal","They may be linearly dependent"],k:0},
+{o:["rank 1; null space span{(2, &minus;1)}; eigenvalues 0 and 5","rank 2; null space {0}; eigenvalues 1 and 4","rank 1; null space span{(1, 2)}; eigenvalues 0 and 4"],k:0},
+{o:["Always orthogonal","Always parallel","No special relation"],k:0},
+{o:["Inverses cost more and amplify rounding error; use LU/Cholesky/QR factorizations","x = A<sup>&minus;1</sup>b is fastest and most accurate","Cramer&rsquo;s rule is preferred for large systems"],k:0},
+{o:["&pi; = (5/6, 1/6), the eigenvector for &lambda; = 1","&pi; = (1/2, 1/2), the eigenvector for &lambda; = 0","&pi; = (0.9, 0.1), the first column of P"],k:0},
+{o:["Only (b) is true","(a) and (b) are true","All three are true"],k:0},
+{o:["x<sup>T</sup>Ax &gt; 0 for all x &ne; 0; equivalently all eigenvalues &gt; 0","det(A) &gt; 0 is sufficient","All entries of A are positive"],k:0},
+// Probability
+{o:["1/6","1/12","5/36"],k:0},
+{o:["No &mdash; disjointness would force P(A)P(B) = 0","Yes, always","Yes, if the sample space is large enough"],k:0},
+{o:["E[X] = 1.5","E[X] = 2","E[X] = 1"],k:0},
+{o:["f &ge; 0 and &int;f = 1; f may exceed 1","f &ge; 0 and f &le; 1 everywhere","&int;f = 1 and f must be continuous"],k:0},
+{o:["1/221","1/169","1/26"],k:0},
+{o:["P = 1/2, E[X] = 2, Var = 4/3","P = 1/2, E[X] = 2, Var = 4","P = 1/4, E[X] = 2, Var = 4/3"],k:0},
+{o:["About 17%","About 99%","About 95%"],k:0},
+{o:["c = 3/8, P(X &gt; 1) = 7/8, E[X] = 3/2","c = 1/8, P(X &gt; 1) = 1/2, E[X] = 1","c = 3/8, P(X &gt; 1) = 1/8, E[X] = 3/2"],k:0},
+{o:["2","4","1.5"],k:0},
+{o:["Total probability gives P(A) by cases; Bayes reverses the conditioning using it as denominator","They are the same theorem","Bayes computes marginals; total probability reverses conditioning"],k:0},
+{o:["5/6","1/2","11/36"],k:0},
+{o:["Z ~ N(0, 1); about 68%, 95%, 99.7%","Z ~ N(0, 1); about 50%, 75%, 95%","Z ~ N(&mu;, 1); about 68%, 95%, 99.7%"],k:0},
+{o:["5/28","3/8","15/56"],k:0},
+{o:["Mean np, variance np(1 &minus; p)","Mean np, variance np","Mean p, variance p&sup2;"],k:0},
+{o:["Switch: winning probability 2/3","Stay: winning probability 2/3","No difference: 1/2 either way"],k:0},
+{o:["F(x) = 1 &minus; e<sup>&minus;&lambda;x</sup>, mean 1/&lambda;, and P(X &gt; s+t | X &gt; s) = e<sup>&minus;&lambda;t</sup>","F(x) = e<sup>&minus;&lambda;x</sup>, mean &lambda;, memoryless","F(x) = 1 &minus; e<sup>&minus;&lambda;x</sup>, mean 1/&lambda;&sup2;, not memoryless"],k:0},
+{o:["LLN: X&#772; &rarr; &mu;; CLT: fluctuations approximately normal, of order 1/&radic;n","Both state that X&#772; is exactly normal","CLT: X&#772; &rarr; &mu;; LLN: fluctuations are normal"],k:0},
+{o:["About 0.51","About 0.06","About 0.95"],k:0},
+{o:["f<sub>X</sub>(x) = 2x; not independent (triangular support)","f<sub>X</sub>(x) = 2x; independent","f<sub>X</sub>(x) = 2; independent"],k:0},
+{o:["Approximately N(350, 292); P &asymp; 4%","Approximately N(350, 292); P &asymp; 30%","Exactly uniform; P = 1/6"],k:0},
+// Data Structures & Algorithms
+{o:["log n &lt; n &lt; n log n &lt; n&sup2; &lt; 2<sup>n</sup> &lt; n!","log n &lt; n log n &lt; n &lt; n&sup2; &lt; n! &lt; 2<sup>n</sup>","n &lt; log n &lt; n&sup2; &lt; n log n &lt; 2<sup>n</sup> &lt; n!"],k:0},
+{o:["O(log n); the array must be sorted","O(n); works on any array","O(log n); works on any array"],k:0},
+{o:["Array: O(1) access, O(n) front insert; list: O(n) access, O(1) front insert","Array: O(n) access; list: O(1) access","Both: O(1) access and O(1) front insert"],k:0},
+{o:["O(h); worst O(n) when the tree degenerates into a chain","Always O(log n)","O(n) in every case"],k:0},
+{o:["A stack: push openers, match each closer against the top","A queue: process brackets FIFO","Equal counts of openers and closers imply balanced"],k:0},
+{o:["O(n&sup2;) in all cases &mdash; even on sorted input","O(n log n) on average","O(n) on sorted input"],k:0},
+{o:["O(n log n) worst case, stable, O(n) extra space","O(n&sup2;) worst case, in-place","O(n log n) worst case, in-place, unstable"],k:0},
+{o:["Hash set: for each x check s &minus; x; O(n) average","Nested loops: O(n&sup2;) is optimal","Binary search each element: O(log n) total"],k:0},
+{o:["BFS: shortest paths (unweighted); DFS: cycle detection, topological sort","DFS finds shortest paths; BFS detects cycles","Both are O(V&sup2;) on adjacency lists"],k:0},
+{o:["Three pointers (prev, cur, next), flip each link once: O(n) time, O(1) space","Copy to an array and rebuild: O(1) space","Recursion is required and uses O(1) space"],k:0},
+{o:["Peek O(1); insert and extract-min O(log n); children of i at 2i+1, 2i+2","All operations O(1)","Peek O(log n); insert O(1)"],k:0},
+{o:["Amortized O(1): doubling spreads the occasional O(n) copy","Amortized O(n): every append copies","Amortized O(log n)"],k:0},
+{o:["Average O(n log n); worst O(n&sup2;), avoided with random / median-of-three pivots","Worst case O(n log n) always","Average O(n); worst O(n log n)"],k:0},
+{o:["O((V+E) log V) with a heap; requires non-negative edge weights","Works with any weights in O(VE)","Requires a DAG and runs in O(V + E)"],k:0},
+{o:["6, subarray [4, &minus;1, 2, 1]","7, subarray [4, 2, 1]","4, subarray [4]"],k:0},
+{o:["Exists iff the graph is a DAG; Kahn&rsquo;s algorithm, O(V + E)","Exists for every directed graph","Requires an undirected tree"],k:0},
+{o:["Hash: O(1) average, unordered; BST: O(log n), ordered, range queries","A BST is always faster","Hash tables keep keys sorted"],k:0},
+{o:["DFS: a visited neighbor that is not the parent means a cycle","Any visited neighbor means a cycle","E = V &minus; 1 means a cycle exists"],k:0},
+{o:["Min-heap of size k: O(n log k), works on streams","Full sort: O(n log n) is required","Max-heap of all n items: O(n) memory needed"],k:0},
+{o:["Optimal substructure + overlapping subproblems; naive Fib exponential, memoized O(n)","Greedy-choice property; naive Fib O(n&sup2;)","Requires acyclic input; memoized Fib O(n log n)"],k:0},
+// Operating Systems
+{o:["Share address space and open files; each has its own stack and registers","Share stacks; each has its own heap","Share nothing; communicate only via messages"],k:0},
+{o:["Blocked &rarr; Ready when the awaited event completes","Blocked &rarr; Running directly when I/O finishes","Ready &rarr; Blocked upon preemption"],k:0},
+{o:["Registers and PC saved to the PCB; caches and TLB go cold","Only the program counter is saved","The heap is copied to disk"],k:0},
+{o:["Isolation, illusion of large memory, and sharing (e.g. copy-on-write)","It makes RAM physically larger","It removes the need for disk storage"],k:0},
+{o:["A long job at the head of FCFS delays all the short jobs behind it","RR always beats FCFS in total throughput","Short jobs blocking long ones in FCFS"],k:0},
+{o:["Size, permissions, timestamps, block pointers &mdash; but not the file name","The file name and its data","Only the locations of data blocks"],k:0},
+{o:["Both threads may read 5 and store 6 &mdash; one increment is lost","The result is always 7","Hardware makes counter++ atomic automatically"],k:0},
+{o:["All four must hold simultaneously; breaking any one prevents deadlock","Any single condition suffices for deadlock","They apply only to single-core systems"],k:0},
+{o:["20-bit page number + 12-bit offset","12-bit page number + 20-bit offset","16-bit page number + 16-bit offset"],k:0},
+{o:["A cache of address translations; flushed on context switch unless ASID-tagged","A cache of recently used file blocks","A buffer for pending interrupts"],k:0},
+{o:["FIFO shows it; LRU never does","LRU shows it; FIFO never does","Optimal suffers from it most"],k:0},
+{o:["FCFS: 17 ms; SJF: 3 ms","FCFS: 3 ms; SJF: 17 ms","Both average 10 ms"],k:0},
+{o:["wait(empty) before wait(mutex); reversing can deadlock when the buffer is full","Take the mutex first; the order never matters","Only a single mutex is needed"],k:0},
+{o:["Mutex: exclusion; condition variable: wait for state (in a while loop); semaphore: counting/signaling","The three are interchangeable","Semaphores have ownership; mutexes count resources"],k:0},
+{o:["p &le; 1.25 &times; 10<sup>&minus;5</sup> &mdash; even tiny fault rates are devastating","p &le; 0.01","p &le; 0.5"],k:0},
+{o:["Working sets exceed RAM; suspend processes until resident sets fit","The CPU is too fast for the memory bus","It is fixed by admitting more processes"],k:0},
+{o:["The child customizes I/O (redirection, pipes) between fork and exec; COW makes fork cheap","exec creates the process; fork loads the program","fork physically copies all memory immediately"],k:0},
+{o:["Direct pointers plus single/double/triple indirect blocks","One contiguous extent only","A linked chain of blocks with O(n) random access"],k:0},
+{o:["A trap switches to kernel mode at a fixed entry point; the kernel validates and performs the I/O","An ordinary function call into a kernel library","The kernel runs in user mode for safety"],k:0},
+{o:["T1 holds A wanting B while T2 holds B wanting A; fix with a global lock order or trylock","Deadlock is impossible with only two locks","It is fixed by adding a third lock"],k:0}
+];
+QUESTIONS.forEach((q,i)=>{ q.c = CHOICES[i].o; q.k = CHOICES[i].k; });
 
 let topicSel = "all", diffSel = 0, order = [], idx = 0;
-const scores = {}; // qIndex -> 0/1/2
+const scores = {}; // qIndex -> 0/2
+const picks = {};  // qIndex -> chosen option index (-1 = revealed without answering)
+const perm = {};   // qIndex -> shuffled display order of the 3 options
 let studentName = "";
 try{ studentName = localStorage.getItem("kaustName") || ""; }catch(e){}
 
@@ -604,26 +716,47 @@ function render(){
   el("h1Text").innerHTML = q.h1; el("h2Text").innerHTML = q.h2; el("ansText").innerHTML = q.a;
   ["h1Box","h2Box","ansBox"].forEach(b=>el(b).classList.remove("show"));
   el("h1Btn").disabled=false; el("h2Btn").disabled=true; el("ansBtn").disabled=false;
-  el("gradeRow").classList.remove("show");
   el("cheer").classList.remove("show");
-  document.querySelectorAll(".grade button").forEach(b=>b.classList.remove("picked"));
-  const g = scores[order[idx]];
-  if(g!==undefined){
-    el("gradeRow").classList.add("show");
-    document.querySelectorAll(".grade button").forEach(b=>{ if(+b.dataset.g===g) b.classList.add("picked"); });
-  }
+  renderChoices();
+  if(picks[order[idx]]!==undefined){ el("ansBox").classList.add("show"); el("ansBtn").disabled=true; }
   el("prevBtn").disabled = idx===0;
   el("nextBtn").disabled = idx>=order.length-1;
   window.scrollTo({top:0});
 }
 el("h1Btn").onclick = ()=>{ el("h1Box").classList.add("show"); el("h1Btn").disabled=true; el("h2Btn").disabled=false; };
 el("h2Btn").onclick = ()=>{ el("h2Box").classList.add("show"); el("h2Btn").disabled=true; };
-el("ansBtn").onclick = ()=>{ el("ansBox").classList.add("show"); el("ansBtn").disabled=true; el("gradeRow").classList.add("show"); };
-document.querySelectorAll(".grade button").forEach(b=>{
-  b.onclick = ()=>{ scores[order[idx]] = +b.dataset.g;
-    document.querySelectorAll(".grade button").forEach(x=>x.classList.remove("picked"));
-    b.classList.add("picked"); cheerFor(+b.dataset.g); };
-});
+el("ansBtn").onclick = ()=>{
+  const qi = order[idx];
+  if(picks[qi]===undefined){ picks[qi] = -1; scores[qi] = 0; cheerFor(0); renderChoices(); }
+  el("ansBox").classList.add("show"); el("ansBtn").disabled=true;
+};
+function renderChoices(){
+  const qi = order[idx], q = QUESTIONS[qi], div = el("choices");
+  div.innerHTML = "";
+  if(!q || !q.c) return;
+  if(!perm[qi]) perm[qi] = [0,1,2].sort(()=>Math.random()-0.5);
+  const done = picks[qi]!==undefined;
+  perm[qi].forEach((oi,pos)=>{
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.innerHTML = "<b>" + "ABC"[pos] + ".</b> " + q.c[oi];
+    if(done){
+      b.disabled = true;
+      if(oi===q.k) b.classList.add("right");
+      else if(oi===picks[qi]) b.classList.add("wrong");
+    } else {
+      b.onclick = ()=>{
+        picks[qi] = oi;
+        const ok = oi===q.k;
+        scores[qi] = ok ? 2 : 0;
+        cheerFor(ok ? 2 : 0);
+        el("ansBox").classList.add("show"); el("ansBtn").disabled=true;
+        renderChoices();
+      };
+    }
+    div.appendChild(b);
+  });
+}
 el("prevBtn").onclick = ()=>{ if(idx>0){idx--; render();} };
 el("nextBtn").onclick = ()=>{ if(idx<order.length-1){idx++; render();} };
 el("shuffleBtn").onclick = ()=>rebuild(true);
