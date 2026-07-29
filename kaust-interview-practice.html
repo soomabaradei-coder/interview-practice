@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAUST Master's Interview Practice</title>
+<style>
+  :root{
+    --bg:#f4f6fa; --card:#ffffff; --ink:#1a2333; --muted:#5b6577;
+    --accent:#00543c; --accent2:#c8a45e; --line:#e2e7ef;
+    --easy:#2e7d32; --med:#e65100; --hard:#b71c1c;
+    --hint:#fff8e6; --ans:#eef6f2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:Georgia,"Times New Roman",serif; background:var(--bg); color:var(--ink); line-height:1.55;}
+  header{background:var(--accent); color:#fff; padding:18px 24px;}
+  header h1{font-size:1.35rem; font-weight:600;}
+  header p{font-size:.9rem; opacity:.85; margin-top:2px;}
+  .wrap{max-width:860px; margin:0 auto; padding:20px 16px 60px;}
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; font-family:Helvetica,Arial,sans-serif;}
+  .filters button{border:1px solid var(--line); background:var(--card); color:var(--ink);
+    padding:7px 14px; border-radius:20px; cursor:pointer; font-size:.85rem;}
+  .filters button.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .bar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;
+    font-family:Helvetica,Arial,sans-serif; font-size:.85rem; color:var(--muted);}
+  .bar b{color:var(--ink);}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:24px 26px; box-shadow:0 1px 4px rgba(20,30,50,.06);}
+  .tags{display:flex; gap:8px; margin-bottom:12px; font-family:Helvetica,Arial,sans-serif;}
+  .tag{font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; padding:3px 10px;
+    border-radius:12px; background:#eef1f6; color:var(--muted); font-weight:700;}
+  .tag.d1{color:var(--easy);} .tag.d2{color:var(--med);} .tag.d3{color:var(--hard);}
+  .q{font-size:1.05rem; margin-bottom:18px;}
+  .q code, .box code{font-family:Menlo,Consolas,monospace; font-size:.92em; background:#f0f2f7;
+    padding:1px 5px; border-radius:4px;}
+  .btns{display:flex; flex-wrap:wrap; gap:8px; font-family:Helvetica,Arial,sans-serif;}
+  .btns button{border:none; padding:9px 16px; border-radius:8px; cursor:pointer; font-size:.85rem; font-weight:600;}
+  .bh{background:var(--accent2); color:#fff;}
+  .ba{background:var(--accent); color:#fff;}
+  .bn{background:#e8ebf1; color:var(--ink);}
+  .btns button:disabled{opacity:.45; cursor:default;}
+  .box{margin-top:14px; padding:14px 16px; border-radius:8px; font-size:.97rem; display:none;}
+  .box.show{display:block;}
+  .hintbox{background:var(--hint); border:1px solid #ecd9a8;}
+  .ansbox{background:var(--ans); border:1px solid #cfe3da;}
+  .box .lbl{font-family:Helvetica,Arial,sans-serif; font-size:.72rem; letter-spacing:.06em;
+    text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:6px;}
+  .grade{margin-top:16px; display:none; font-family:Helvetica,Arial,sans-serif;}
+  .grade.show{display:block;}
+  .grade span{font-size:.85rem; color:var(--muted); margin-right:10px;}
+  .grade button{border:1px solid var(--line); background:#fff; padding:7px 14px; border-radius:8px;
+    cursor:pointer; font-size:.85rem; margin-right:6px;}
+  .grade button.gr{border-color:var(--easy); color:var(--easy);}
+  .grade button.gp{border-color:var(--med); color:var(--med);}
+  .grade button.gw{border-color:var(--hard); color:var(--hard);}
+  .grade button.picked{color:#fff;}
+  .grade button.gr.picked{background:var(--easy);}
+  .grade button.gp.picked{background:var(--med);}
+  .grade button.gw.picked{background:var(--hard);}
+  .nav{display:flex; justify-content:space-between; margin-top:18px; font-family:Helvetica,Arial,sans-serif;}
+  .nav button{border:none; background:var(--accent); color:#fff; padding:10px 20px;
+    border-radius:8px; cursor:pointer; font-size:.9rem; font-weight:600;}
+  .nav button:disabled{opacity:.4; cursor:default;}
+  #report{margin-top:22px; display:none;}
+  #report.show{display:block;}
+  #report table{width:100%; border-collapse:collapse; font-family:Helvetica,Arial,sans-serif; font-size:.88rem;}
+  #report th,#report td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
+  #report th{background:#eef1f6;}
+  .foot{margin-top:26px; font-size:.8rem; color:var(--muted); font-family:Helvetica,Arial,sans-serif; text-align:center;}
+  sub,sup{line-height:0;}
+  #welcome{position:fixed; inset:0; background:rgba(10,20,16,.55); display:flex;
+    align-items:center; justify-content:center; z-index:10;}
+  #welcome.hide{display:none;}
+  .wcard{background:#fff; border-radius:14px; padding:34px 36px; max-width:420px; width:90%;
+    text-align:center; font-family:Helvetica,Arial,sans-serif; box-shadow:0 8px 40px rgba(0,0,0,.25);}
+  .wcard h2{font-family:Georgia,serif; color:var(--accent); margin-bottom:8px;}
+  .wcard p{color:var(--muted); font-size:.9rem; margin-bottom:18px;}
+  .wcard input{width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px;
+    font-size:1rem; margin-bottom:14px; text-align:center;}
+  .wcard button{background:var(--accent); color:#fff; border:none; padding:11px 26px;
+    border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;}
+  #cheer{margin-top:12px; padding:12px 16px; border-radius:8px; background:#eef4ff;
+    border:1px solid #c9d9f5; color:#1d3f7a; font-family:Helvetica,Arial,sans-serif;
+    font-size:.92rem; display:none;}
+  #cheer.show{display:block;}
+</style>
+</head>
+<body>
+<header>
+  <h1>KAUST Master&rsquo;s Interview Practice</h1>
+  <p id="subtitle">100 questions &middot; Calculus &middot; Linear Algebra &middot; Probability &middot; Data Structures &amp; Algorithms &middot; Operating Systems</p>
+</header>
+<div id="welcome">
+  <div class="wcard">
+    <h2>Welcome!</h2>
+    <p>100 KAUST-style interview questions across Calculus, Linear Algebra, Probability, Algorithms, and Operating Systems. What is your name?</p>
+    <input id="nameInput" type="text" placeholder="Your name" maxlength="30">
+    <br><button id="startBtn">Start practicing</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="filters" id="topicFilters"></div>
+  <div class="filters" id="diffFilters"></div>
+  <div class="bar">
+    <div>Question <b id="pos">1</b> of <b id="total">0</b></div>
+    <div><button id="reportBtn" style="border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;">Progress report</button></div>
+  </div>
+  <div class="card">
+    <div class="tags"><span class="tag" id="tTopic"></span><span class="tag" id="tDiff"></span></div>
+    <div class="q" id="qText"></div>
+    <div class="btns">
+      <button class="bh" id="h1Btn">Hint 1</button>
+      <button class="bh" id="h2Btn" disabled>Hint 2</button>
+      <button class="ba" id="ansBtn">Show model answer</button>
+    </div>
+    <div class="box hintbox" id="h1Box"><div class="lbl">Hint 1</div><div id="h1Text"></div></div>
+    <div class="box hintbox" id="h2Box"><div class="lbl">Hint 2</div><div id="h2Text"></div></div>
+    <div class="box ansbox" id="ansBox"><div class="lbl">Model answer</div><div id="ansText"></div></div>
+    <div class="grade" id="gradeRow">
+      <span>How did you do?</span>
+      <button class="gr" data-g="2">Got it</button>
+      <button class="gp" data-g="1">Partially</button>
+      <button class="gw" data-g="0">Missed it</button>
+    </div>
+    <div id="cheer"></div>
+  </div>
+  <div class="nav">
+    <button id="prevBtn">&larr; Previous</button>
+    <button id="shuffleBtn" style="background:var(--accent2);">Shuffle</button>
+    <button id="nextBtn">Next &rarr;</button>
+  </div>
+  <div id="report" class="card"></div>
+  <div class="foot">Work each problem on paper and explain your reasoning aloud before revealing the answer &mdash; that is what the interview tests.</div>
+</div>
+<script>
+const TOPICS = {calc:"Calculus", la:"Linear Algebra", prob:"Probability", dsa:"Data Structures & Algorithms", os:"Operating Systems"};
+const DIFFS = {1:"Easy", 2:"Medium", 3:"Hard"};
+const QUESTIONS = [
+// ---------- CALCULUS ----------
+{t:"calc",d:1,q:"Differentiate f(x) = x&sup3; e<sup>2x</sup>. Explain which rule you use and why.",
+h1:"The function is a product of two functions of x.",
+h2:"Product rule: (uv)&prime; = u&prime;v + uv&prime;, and the chain rule for e<sup>2x</sup>.",
+a:"Use the product rule with u = x&sup3;, v = e<sup>2x</sup>. Then u&prime; = 3x&sup2; and v&prime; = 2e<sup>2x</sup> (chain rule). So f&prime;(x) = 3x&sup2;e<sup>2x</sup> + 2x&sup3;e<sup>2x</sup> = x&sup2;e<sup>2x</sup>(3 + 2x)."},
+{t:"calc",d:1,q:"Compute &int; x cos(x) dx. State the technique you choose and why.",
+h1:"The integrand is a product of a polynomial and a trig function.",
+h2:"Integration by parts: &int;u dv = uv &minus; &int;v du. Let u = x so it disappears after differentiation.",
+a:"Integration by parts with u = x, dv = cos(x)dx gives du = dx, v = sin(x). So the integral is x sin(x) &minus; &int; sin(x) dx = x sin(x) + cos(x) + C. We pick u = x because differentiating it reduces the polynomial degree."},
+{t:"calc",d:1,q:"Conceptual: what does it mean for a function f to be differentiable at a point, and give an example of a function that is continuous but not differentiable at some point.",
+h1:"Differentiability is about the existence of a certain limit.",
+h2:"Think of a function with a sharp corner.",
+a:"f is differentiable at a if the limit lim<sub>h&rarr;0</sub> [f(a+h) &minus; f(a)]/h exists (finite); geometrically the graph has a unique non-vertical tangent there. Differentiability implies continuity, but not conversely: f(x) = |x| is continuous everywhere but not differentiable at 0, since the left slope (&minus;1) and right slope (+1) disagree."},
+{t:"calc",d:1,q:"Does the sequence a<sub>n</sub> = (2n&sup2; + 3n)/(n&sup2; + 1) converge? If so, to what? Justify.",
+h1:"Divide numerator and denominator by the highest power of n.",
+h2:"Terms like 3/n and 1/n&sup2; vanish as n &rarr; &infin;.",
+a:"Divide top and bottom by n&sup2;: a<sub>n</sub> = (2 + 3/n)/(1 + 1/n&sup2;). As n &rarr; &infin;, 3/n &rarr; 0 and 1/n&sup2; &rarr; 0, so a<sub>n</sub> &rarr; 2/1 = 2. The sequence converges to 2 by the algebra-of-limits rules."},
+{t:"calc",d:1,q:"Evaluate the definite integral &int;<sub>0</sub><sup>1</sup> (3x&sup2; + 2x) dx and interpret the result geometrically.",
+h1:"Find an antiderivative first, then apply the Fundamental Theorem of Calculus.",
+h2:"An antiderivative of 3x&sup2; + 2x is x&sup3; + x&sup2;.",
+a:"An antiderivative is F(x) = x&sup3; + x&sup2;. By the Fundamental Theorem, the integral equals F(1) &minus; F(0) = (1 + 1) &minus; 0 = 2. Geometrically this is the area under the curve y = 3x&sup2; + 2x between x = 0 and x = 1, since the function is non-negative there."},
+{t:"calc",d:1,q:"State the geometric series formula. For which values of r does &Sigma;<sub>n=0</sub><sup>&infin;</sup> r<sup>n</sup> converge, and what is its sum?",
+h1:"Look at the partial sum S<sub>N</sub> = (1 &minus; r<sup>N+1</sup>)/(1 &minus; r).",
+h2:"When does r<sup>N+1</sup> tend to 0?",
+a:"The series converges iff |r| &lt; 1, with sum 1/(1 &minus; r). This follows because the partial sums S<sub>N</sub> = (1 &minus; r<sup>N+1</sup>)/(1 &minus; r) converge exactly when r<sup>N+1</sup> &rarr; 0, i.e. |r| &lt; 1. For |r| &ge; 1 the terms do not tend to 0, so the series diverges."},
+{t:"calc",d:2,q:"Find and classify all local extrema of f(x) = x&sup3; &minus; 6x&sup2; + 9x + 1.",
+h1:"Critical points are where f&prime;(x) = 0.",
+h2:"f&prime;(x) = 3x&sup2; &minus; 12x + 9 = 3(x &minus; 1)(x &minus; 3). Use the second derivative to classify.",
+a:"f&prime;(x) = 3x&sup2; &minus; 12x + 9 = 3(x&minus;1)(x&minus;3), so critical points are x = 1 and x = 3. f&Prime;(x) = 6x &minus; 12: f&Prime;(1) = &minus;6 &lt; 0 so x = 1 is a local maximum (f(1) = 5); f&Prime;(3) = 6 &gt; 0 so x = 3 is a local minimum (f(3) = 1)."},
+{t:"calc",d:2,q:"Compute the limit lim<sub>x&rarr;0</sub> (1 &minus; cos x)/x&sup2;. Give two different ways to obtain it.",
+h1:"It is a 0/0 indeterminate form.",
+h2:"Either apply L&rsquo;H&ocirc;pital twice, or use the Taylor expansion cos x = 1 &minus; x&sup2;/2 + O(x&#8308;).",
+a:"Method 1 (L&rsquo;H&ocirc;pital): 0/0, so the limit equals lim sin x / 2x, again 0/0, so lim cos x / 2 = 1/2. Method 2 (Taylor): cos x = 1 &minus; x&sup2;/2 + O(x&#8308;), so (1 &minus; cos x)/x&sup2; = 1/2 &minus; O(x&sup2;) &rarr; 1/2. Answer: 1/2."},
+{t:"calc",d:2,q:"Let f(x, y) = x&sup2; + 3xy + y&sup2;. Compute the gradient &nabla;f and evaluate it at (1, 2). What does the gradient tell you geometrically?",
+h1:"The gradient is the vector of partial derivatives.",
+h2:"&part;f/&part;x treats y as a constant; the gradient points in the direction of steepest ascent.",
+a:"&part;f/&part;x = 2x + 3y and &part;f/&part;y = 3x + 2y, so &nabla;f = (2x + 3y, 3x + 2y). At (1, 2): &nabla;f = (8, 7). Geometrically, &nabla;f points in the direction of steepest increase of f, its magnitude is the maximal rate of increase, and it is perpendicular to the level curve of f through that point."},
+{t:"calc",d:2,q:"Determine whether the series &Sigma;<sub>n=1</sub><sup>&infin;</sup> 1/n&sup2; and &Sigma;<sub>n=1</sub><sup>&infin;</sup> 1/n converge or diverge, and explain the tests you use.",
+h1:"One is a p-series with p = 2, the other is the harmonic series.",
+h2:"Compare with integrals: &int;<sub>1</sub><sup>&infin;</sup> dx/x<sup>p</sup> converges iff p &gt; 1.",
+a:"Both are p-series &Sigma;1/n<sup>p</sup>. By the integral test, &int;<sub>1</sub><sup>&infin;</sup> x<sup>&minus;p</sup>dx converges iff p &gt; 1. So &Sigma;1/n&sup2; converges (p = 2; its sum is &pi;&sup2;/6), while the harmonic series &Sigma;1/n diverges (p = 1) &mdash; even though its terms tend to 0, its partial sums grow like ln n. This shows terms &rarr; 0 is necessary but not sufficient for convergence."},
+{t:"calc",d:2,q:"Compute &int; x e<sup>x&sup2;</sup> dx and &int; x e<sup>x</sup> dx. Why do the two integrals need different techniques?",
+h1:"Look for an inner function whose derivative appears as a factor.",
+h2:"x is (up to a constant) the derivative of x&sup2; &mdash; substitution works for the first. The second has no such structure; use parts.",
+a:"First: substitute u = x&sup2;, du = 2x dx, giving (1/2)&int;e<sup>u</sup>du = (1/2)e<sup>x&sup2;</sup> + C. Second: integration by parts with u = x, dv = e<sup>x</sup>dx gives xe<sup>x</sup> &minus; e<sup>x</sup> + C. The first works by substitution because the factor x is proportional to the derivative of the exponent; in the second no substitution simplifies it, but differentiating x eliminates it, which is exactly what parts exploits."},
+{t:"calc",d:2,q:"Find the equation of the tangent line to the curve defined implicitly by x&sup2; + xy + y&sup2; = 7 at the point (1, 2).",
+h1:"Differentiate both sides with respect to x, treating y as a function of x.",
+h2:"2x + y + x(dy/dx) + 2y(dy/dx) = 0; solve for dy/dx, then plug in (1, 2).",
+a:"Implicit differentiation: 2x + y + (x + 2y)y&prime; = 0, so y&prime; = &minus;(2x + y)/(x + 2y). At (1, 2): y&prime; = &minus;(2+2)/(1+4) = &minus;4/5. Tangent line: y &minus; 2 = (&minus;4/5)(x &minus; 1), i.e. y = (&minus;4/5)x + 14/5."},
+{t:"calc",d:2,q:"A rectangular box with a square base and open top must have volume 32 m&sup3;. Find the dimensions minimizing the surface area, and verify it is a minimum.",
+h1:"Write area A in terms of one variable using the volume constraint.",
+h2:"With base side x and height h = 32/x&sup2;, A(x) = x&sup2; + 4xh = x&sup2; + 128/x. Set A&prime; = 0.",
+a:"Let the base side be x and height h. Constraint: x&sup2;h = 32, so h = 32/x&sup2;. Surface area (no top): A = x&sup2; + 4xh = x&sup2; + 128/x. A&prime;(x) = 2x &minus; 128/x&sup2; = 0 gives x&sup3; = 64, x = 4, h = 2. A&Prime;(x) = 2 + 256/x&sup3; &gt; 0, so this is a minimum. Dimensions: 4 &times; 4 &times; 2 m, area 48 m&sup2;."},
+{t:"calc",d:2,q:"Find the radius of convergence of the power series &Sigma;<sub>n=1</sub><sup>&infin;</sup> x<sup>n</sup>/n.",
+h1:"Apply the ratio test to the general term.",
+h2:"lim |a<sub>n+1</sub>/a<sub>n</sub>| = |x| &middot; lim n/(n+1). Also check the endpoints x = &plusmn;1.",
+a:"Ratio test: |x<sup>n+1</sup>/(n+1)| &divide; |x<sup>n</sup>/n| = |x|&middot;n/(n+1) &rarr; |x|. The series converges for |x| &lt; 1, so the radius of convergence is R = 1. At x = 1 it is the harmonic series (diverges); at x = &minus;1 it is the alternating harmonic series (converges by the alternating series test). Interval: [&minus;1, 1)."},
+{t:"calc",d:3,q:"Find and classify the critical points of f(x, y) = x&sup3; &minus; 3x + y&sup2;.",
+h1:"Set both partial derivatives to zero simultaneously.",
+h2:"Use the Hessian: with f<sub>xx</sub>f<sub>yy</sub> &minus; f<sub>xy</sub>&sup2; = D, D &gt; 0 with f<sub>xx</sub> &gt; 0 means a minimum; D &lt; 0 means a saddle.",
+a:"f<sub>x</sub> = 3x&sup2; &minus; 3 = 0 gives x = &plusmn;1; f<sub>y</sub> = 2y = 0 gives y = 0. Critical points: (1, 0) and (&minus;1, 0). Hessian entries: f<sub>xx</sub> = 6x, f<sub>yy</sub> = 2, f<sub>xy</sub> = 0, so D = 12x. At (1, 0): D = 12 &gt; 0, f<sub>xx</sub> = 6 &gt; 0 &rarr; local minimum. At (&minus;1, 0): D = &minus;12 &lt; 0 &rarr; saddle point."},
+{t:"calc",d:3,q:"Evaluate the double integral &int;&int;<sub>D</sub> e<sup>&minus;(x&sup2;+y&sup2;)</sup> dA where D is the disk x&sup2; + y&sup2; &le; R&sup2;. What happens as R &rarr; &infin;?",
+h1:"The integrand and the region are both rotationally symmetric.",
+h2:"Switch to polar coordinates: dA = r dr d&theta;, and the extra r makes the integral elementary.",
+a:"In polar coordinates: &int;<sub>0</sub><sup>2&pi;</sup>&int;<sub>0</sub><sup>R</sup> e<sup>&minus;r&sup2;</sup> r dr d&theta; = 2&pi; &middot; [&minus;e<sup>&minus;r&sup2;</sup>/2]<sub>0</sub><sup>R</sup> = &pi;(1 &minus; e<sup>&minus;R&sup2;</sup>). As R &rarr; &infin; this tends to &pi;. This is the classical route to the Gaussian integral: it implies &int;<sub>&minus;&infin;</sub><sup>&infin;</sup>e<sup>&minus;x&sup2;</sup>dx = &radic;&pi;."},
+{t:"calc",d:3,q:"Use Lagrange multipliers to find the maximum of f(x, y) = xy subject to the constraint x&sup2; + y&sup2; = 8.",
+h1:"Set &nabla;f = &lambda;&nabla;g where g(x,y) = x&sup2; + y&sup2; &minus; 8.",
+h2:"y = 2&lambda;x and x = 2&lambda;y &mdash; combine them to conclude x&sup2; = y&sup2;.",
+a:"&nabla;f = (y, x), &nabla;g = (2x, 2y). Conditions: y = 2&lambda;x, x = 2&lambda;y. Multiplying gives xy = 4&lambda;&sup2;xy; for xy &ne; 0, &lambda; = &plusmn;1/2, forcing y = &plusmn;x. Substituting into x&sup2; + y&sup2; = 8 gives x&sup2; = 4. Candidates: (2,2), (&minus;2,&minus;2) with f = 4; (2,&minus;2), (&minus;2,2) with f = &minus;4. Maximum value 4 at (2, 2) and (&minus;2, &minus;2)."},
+{t:"calc",d:3,q:"Determine whether &Sigma;<sub>n=1</sub><sup>&infin;</sup> (&minus;1)<sup>n+1</sup>/n converges absolutely, conditionally, or diverges. Define the terms you use.",
+h1:"Check absolute convergence first: what is &Sigma;1/n?",
+h2:"Then apply the alternating series (Leibniz) test to the signed series.",
+a:"Absolute convergence would require &Sigma;1/n to converge, but that is the divergent harmonic series &mdash; so no absolute convergence. The alternating series test applies: 1/n is positive, decreasing, and tends to 0, so the series converges. Hence it converges conditionally (its sum is ln 2). Definitions: absolutely convergent means &Sigma;|a<sub>n</sub>| converges; conditionally convergent means &Sigma;a<sub>n</sub> converges but &Sigma;|a<sub>n</sub>| does not."},
+{t:"calc",d:3,q:"Write the Taylor series of e<sup>x</sup> about 0, and use it to estimate e<sup>0.1</sup> with error less than 10<sup>&minus;4</sup>. How many terms do you need, and how do you bound the error?",
+h1:"e<sup>x</sup> = &Sigma; x<sup>n</sup>/n!. The error after truncating is the remainder term.",
+h2:"Lagrange remainder: |R<sub>n</sub>| &le; e<sup>0.1</sup>(0.1)<sup>n+1</sup>/(n+1)!. Try small n.",
+a:"e<sup>x</sup> = &Sigma;<sub>n=0</sub><sup>&infin;</sup> x<sup>n</sup>/n!. With x = 0.1, the Lagrange remainder after n terms is bounded by e<sup>0.1</sup>(0.1)<sup>n+1</sup>/(n+1)! &lt; 1.2&middot;(0.1)<sup>n+1</sup>/(n+1)!. For n = 3: 1.2 &times; 10<sup>&minus;4</sup>/24 &asymp; 5&times;10<sup>&minus;6</sup> &lt; 10<sup>&minus;4</sup>. So four terms suffice: e<sup>0.1</sup> &asymp; 1 + 0.1 + 0.005 + 0.000167 &asymp; 1.10517."},
+{t:"calc",d:3,q:"Conceptual: state the Fundamental Theorem of Calculus (both parts) and explain in plain language why differentiation and integration are inverse operations.",
+h1:"Part 1 concerns d/dx of &int;<sub>a</sub><sup>x</sup> f(t)dt; Part 2 evaluates definite integrals via antiderivatives.",
+h2:"Think of the accumulated area function: how fast does it grow at x?",
+a:"Part 1: if f is continuous, F(x) = &int;<sub>a</sub><sup>x</sup>f(t)dt is differentiable and F&prime;(x) = f(x). Part 2: if F is any antiderivative of f, then &int;<sub>a</sub><sup>b</sup>f(x)dx = F(b) &minus; F(a). Intuition: the accumulated-area function grows at exactly the rate given by the height of the curve, so differentiating the accumulation recovers the original function; conversely, total change equals the integral of the rate of change."},
+// ---------- LINEAR ALGEBRA ----------
+{t:"la",d:1,q:"Solve the system: x + y = 5, 2x &minus; y = 1. Then explain what it means geometrically.",
+h1:"Add the two equations to eliminate y.",
+h2:"Each equation is a line in the plane; the solution is where they meet.",
+a:"Adding: 3x = 6, so x = 2, then y = 3. Geometrically each equation is a line in R&sup2;, and (2, 3) is their unique intersection point. A system of two lines can have exactly one solution (lines cross), none (parallel), or infinitely many (same line)."},
+{t:"la",d:1,q:"Conceptual: when is a square matrix invertible? Give at least three equivalent conditions.",
+h1:"Think determinant, rank, and null space.",
+h2:"Also think about what Ax = b requires for every b.",
+a:"A (n&times;n) is invertible iff: det(A) &ne; 0; rank(A) = n (full rank); the columns (equivalently rows) are linearly independent; the null space is {0} (Ax = 0 only for x = 0); Ax = b has a unique solution for every b; 0 is not an eigenvalue of A. All these conditions are equivalent &mdash; this is the Invertible Matrix Theorem."},
+{t:"la",d:1,q:"Compute the determinant and, if it exists, the inverse of A = [[2, 1], [5, 3]].",
+h1:"For a 2&times;2 matrix [[a,b],[c,d]], det = ad &minus; bc.",
+h2:"Inverse: (1/det) [[d, &minus;b], [&minus;c, a]].",
+a:"det(A) = 2&middot;3 &minus; 1&middot;5 = 1 &ne; 0, so A is invertible. A<sup>&minus;1</sup> = (1/1)[[3, &minus;1], [&minus;5, 2]] = [[3, &minus;1], [&minus;5, 2]]. Verify: A&middot;A<sup>&minus;1</sup> = I."},
+{t:"la",d:1,q:"Define eigenvalue and eigenvector. Why are they useful? Give one concrete application.",
+h1:"Av = &lambda;v with v &ne; 0.",
+h2:"Think of directions the matrix only stretches, and of repeated application of A.",
+a:"A nonzero vector v is an eigenvector of A with eigenvalue &lambda; if Av = &lambda;v: the map A only scales v, without changing its direction. They matter because they diagonalize A when a full eigenbasis exists, making powers A<sup>k</sup> and differential/difference equations easy to analyze. Applications: PageRank (dominant eigenvector of the web link matrix), PCA (eigenvectors of the covariance matrix), stability of dynamical systems."},
+{t:"la",d:1,q:"Is the set of vectors {(1, 2), (2, 4)} linearly independent? What subspace of R&sup2; do they span?",
+h1:"Check whether one vector is a scalar multiple of the other.",
+h2:"(2, 4) = 2&middot;(1, 2).",
+a:"They are linearly dependent since (2,4) = 2(1,2). Their span is the line {t(1, 2) : t &isin; R}, a 1-dimensional subspace of R&sup2;. In general, k vectors are independent iff no nontrivial linear combination gives the zero vector."},
+{t:"la",d:1,q:"Conceptual: what is a subspace of R<sup>n</sup>? Which of these are subspaces of R&sup2;: (a) the line y = x, (b) the line y = x + 1, (c) the first quadrant?",
+h1:"A subspace must contain 0 and be closed under addition and scalar multiplication.",
+h2:"Does each candidate contain the origin? Is it closed under multiplying by &minus;1?",
+a:"A subspace is a subset containing the zero vector and closed under vector addition and scalar multiplication. (a) y = x: yes &mdash; contains 0, and sums/scalar multiples of (t, t) stay on the line. (b) y = x + 1: no &mdash; does not contain (0,0). (c) First quadrant: no &mdash; contains (1,1) but not &minus;1&middot;(1,1) = (&minus;1,&minus;1), so not closed under scalar multiplication."},
+{t:"la",d:2,q:"Find the eigenvalues and eigenvectors of A = [[2, 1], [1, 2]].",
+h1:"Solve det(A &minus; &lambda;I) = 0.",
+h2:"(2 &minus; &lambda;)&sup2; &minus; 1 = 0.",
+a:"det(A &minus; &lambda;I) = (2&minus;&lambda;)&sup2; &minus; 1 = &lambda;&sup2; &minus; 4&lambda; + 3 = (&lambda;&minus;1)(&lambda;&minus;3). Eigenvalues: 1 and 3. For &lambda; = 3: (A &minus; 3I)v = 0 gives v = (1, 1). For &lambda; = 1: v = (1, &minus;1). Note the eigenvectors are orthogonal &mdash; as expected, since A is symmetric."},
+{t:"la",d:2,q:"Solve by Gaussian elimination and describe the solution set: x + y + z = 6, 2x + y &minus; z = 1, x + 2y + 4z = 17. Explain how you know whether the solution is unique.",
+h1:"Eliminate x from equations 2 and 3 using equation 1.",
+h2:"After elimination check for a row of zeros (infinitely many solutions) or a contradiction (none). Here you should reach a triangular system.",
+a:"R2 &minus; 2R1: &minus;y &minus; 3z = &minus;11. R3 &minus; R1: y + 3z = 11 &mdash; the same equation, so one row becomes 0 = 0. The system has rank 2 with 3 unknowns: infinitely many solutions. Let z = t: y = 11 &minus; 3t, x = 6 &minus; y &minus; z = &minus;5 + 2t. Solution set: {(&minus;5 + 2t, 11 &minus; 3t, t)}, a line in R&sup3;. Uniqueness would require rank = number of unknowns = 3."},
+{t:"la",d:2,q:"Conceptual: explain the rank-nullity theorem and use it: if A is a 5&times;7 matrix with rank 4, what is the dimension of its null space?",
+h1:"rank + nullity = number of columns.",
+h2:"Columns = 7 here.",
+a:"For A: R<sup>n</sup> &rarr; R<sup>m</sup> (m&times;n matrix), rank(A) + dim Null(A) = n, the number of columns. Intuition: of the n input dimensions, rank(A) survive to the image and the rest collapse to zero. Here n = 7 and rank = 4, so nullity = 3. Also note rank &le; min(5,7) = 5, so rank 4 is consistent."},
+{t:"la",d:2,q:"Let A be a matrix satisfying A&sup2; = A (a projection). What are the possible eigenvalues of A? Prove your claim.",
+h1:"Apply A twice to an eigenvector.",
+h2:"If Av = &lambda;v then A&sup2;v = &lambda;&sup2;v, but also A&sup2;v = Av.",
+a:"If Av = &lambda;v with v &ne; 0, then A&sup2;v = &lambda;&sup2;v. Since A&sup2; = A, &lambda;&sup2;v = &lambda;v, so (&lambda;&sup2; &minus; &lambda;)v = 0, giving &lambda;(&lambda; &minus; 1) = 0. Hence &lambda; &isin; {0, 1}. Geometrically: a projection fixes vectors in its range (&lambda; = 1) and kills vectors in its null space (&lambda; = 0)."},
+{t:"la",d:2,q:"For which values of k does the system x + 2y = 3, 2x + ky = 6 have (a) a unique solution, (b) infinitely many, (c) none?",
+h1:"Look at the determinant of the coefficient matrix.",
+h2:"det = k &minus; 4. When det = 0, compare the two equations directly.",
+a:"det = 1&middot;k &minus; 2&middot;2 = k &minus; 4. If k &ne; 4: unique solution. If k = 4: the second equation is exactly twice the first (2x + 4y = 6 = 2&middot;3), so the equations coincide &mdash; infinitely many solutions. There is no k giving no solution here, because the right-hand sides are also proportional. (If the second RHS were, say, 7, then k = 4 would give a contradiction.)"},
+{t:"la",d:2,q:"Compute A<sup>100</sup>v where A = [[2, 0], [0, 3]] and v = (1, 1). Then explain how diagonalization lets you do the same for non-diagonal matrices.",
+h1:"A is diagonal &mdash; powers act on each coordinate separately.",
+h2:"If A = PDP<sup>&minus;1</sup> then A<sup>k</sup> = PD<sup>k</sup>P<sup>&minus;1</sup>.",
+a:"A<sup>100</sup> = [[2<sup>100</sup>, 0], [0, 3<sup>100</sup>]], so A<sup>100</sup>v = (2<sup>100</sup>, 3<sup>100</sup>). For a diagonalizable A = PDP<sup>&minus;1</sup> (P holds eigenvectors, D eigenvalues), A<sup>k</sup> = PD<sup>k</sup>P<sup>&minus;1</sup>: expand v in the eigenbasis, scale each component by &lambda;<sub>i</sub><sup>k</sup>, and transform back. This is why eigenvalues govern long-run behavior of iterated systems."},
+{t:"la",d:2,q:"Conceptual: what are the four fundamental subspaces of an m&times;n matrix A, and which pairs are orthogonal complements?",
+h1:"Two subspaces live in R<sup>n</sup> (inputs), two in R<sup>m</sup> (outputs).",
+h2:"Row space vs null space; column space vs left null space.",
+a:"Column space C(A) &sube; R<sup>m</sup>; null space N(A) &sube; R<sup>n</sup>; row space C(A<sup>T</sup>) &sube; R<sup>n</sup>; left null space N(A<sup>T</sup>) &sube; R<sup>m</sup>. Orthogonal complement pairs: N(A) &perp; C(A<sup>T</sup>) in R<sup>n</sup>, and N(A<sup>T</sup>) &perp; C(A) in R<sup>m</sup>. Dimensions: dim C(A) = dim C(A<sup>T</sup>) = rank r; dim N(A) = n &minus; r; dim N(A<sup>T</sup>) = m &minus; r."},
+{t:"la",d:3,q:"Prove that eigenvectors corresponding to distinct eigenvalues are linearly independent.",
+h1:"Try two eigenvectors first: suppose c<sub>1</sub>v<sub>1</sub> + c<sub>2</sub>v<sub>2</sub> = 0 and apply A.",
+h2:"Apply (A &minus; &lambda;<sub>2</sub>I) to the relation to kill v<sub>2</sub>.",
+a:"Take Av<sub>1</sub> = &lambda;<sub>1</sub>v<sub>1</sub>, Av<sub>2</sub> = &lambda;<sub>2</sub>v<sub>2</sub>, &lambda;<sub>1</sub> &ne; &lambda;<sub>2</sub>, and suppose c<sub>1</sub>v<sub>1</sub> + c<sub>2</sub>v<sub>2</sub> = 0. Applying (A &minus; &lambda;<sub>2</sub>I): c<sub>1</sub>(&lambda;<sub>1</sub> &minus; &lambda;<sub>2</sub>)v<sub>1</sub> = 0, and since &lambda;<sub>1</sub> &ne; &lambda;<sub>2</sub> and v<sub>1</sub> &ne; 0, c<sub>1</sub> = 0; then c<sub>2</sub>v<sub>2</sub> = 0 forces c<sub>2</sub> = 0. The general case follows by induction on the number of eigenvectors, applying the same trick to eliminate one vector at a time."},
+{t:"la",d:3,q:"Let A = [[1, 2], [2, 4]]. Find its rank, null space, and eigenvalues, and explain how the results are consistent with each other.",
+h1:"The second row is twice the first.",
+h2:"A singular matrix must have 0 as an eigenvalue; the trace gives the other one.",
+a:"Rows are proportional, so rank = 1 and det = 0. Null space: x + 2y = 0, spanned by (2, &minus;1) &mdash; dimension 1, consistent with rank-nullity (2 &minus; 1 = 1). Eigenvalues: det = 0 means &lambda; = 0 is one; trace = 5 = sum of eigenvalues, so the other is 5 (eigenvector (1, 2)). Consistency: the &lambda; = 0 eigenspace is exactly the null space."},
+{t:"la",d:3,q:"Show that a symmetric real matrix has orthogonal eigenvectors for distinct eigenvalues.",
+h1:"Compute v<sub>1</sub><sup>T</sup>Av<sub>2</sub> in two ways.",
+h2:"Use A = A<sup>T</sup>: v<sub>1</sub><sup>T</sup>Av<sub>2</sub> = (Av<sub>1</sub>)<sup>T</sup>v<sub>2</sub>.",
+a:"Let Av<sub>1</sub> = &lambda;<sub>1</sub>v<sub>1</sub>, Av<sub>2</sub> = &lambda;<sub>2</sub>v<sub>2</sub>, &lambda;<sub>1</sub> &ne; &lambda;<sub>2</sub>. Then &lambda;<sub>2</sub>(v<sub>1</sub>&middot;v<sub>2</sub>) = v<sub>1</sub><sup>T</sup>Av<sub>2</sub> = (A<sup>T</sup>v<sub>1</sub>)<sup>T</sup>v<sub>2</sub> = (Av<sub>1</sub>)<sup>T</sup>v<sub>2</sub> = &lambda;<sub>1</sub>(v<sub>1</sub>&middot;v<sub>2</sub>). So (&lambda;<sub>1</sub> &minus; &lambda;<sub>2</sub>)(v<sub>1</sub>&middot;v<sub>2</sub>) = 0, and since the eigenvalues differ, v<sub>1</sub>&middot;v<sub>2</sub> = 0. This is the heart of the spectral theorem: symmetric matrices have an orthonormal eigenbasis and real eigenvalues."},
+{t:"la",d:3,q:"Explain why solving Ax = b via x = A<sup>&minus;1</sup>b is discouraged in numerical practice, and what is done instead.",
+h1:"Think about cost and floating-point error.",
+h2:"Factorization methods reuse work across multiple right-hand sides.",
+a:"Computing A<sup>&minus;1</sup> explicitly costs about three times more flops than solving the system, and amplifies rounding error, especially for ill-conditioned A (large condition number). Instead one factors A: LU decomposition with partial pivoting (Gaussian elimination) then two triangular solves; Cholesky for symmetric positive definite A; QR for least-squares. The factorization is reused cheaply for each new right-hand side b."},
+{t:"la",d:3,q:"A Markov chain has transition matrix P = [[0.9, 0.5], [0.1, 0.5]] (columns sum to 1). Find the steady-state distribution and explain its connection to eigenvalues.",
+h1:"The steady state satisfies P&pi; = &pi; &mdash; an eigenvector equation.",
+h2:"Solve (P &minus; I)&pi; = 0 with the normalization &pi;<sub>1</sub> + &pi;<sub>2</sub> = 1.",
+a:"Steady state is the eigenvector of P for eigenvalue 1: (P &minus; I)&pi; = 0 gives &minus;0.1&pi;<sub>1</sub> + 0.5&pi;<sub>2</sub> = 0, so &pi;<sub>1</sub> = 5&pi;<sub>2</sub>. Normalizing: &pi; = (5/6, 1/6). Every column-stochastic matrix has eigenvalue 1; the other eigenvalue here is 0.4 (trace 1.4), and since |0.4| &lt; 1, iterates P<sup>k</sup>x<sub>0</sub> converge to &pi; from any initial distribution &mdash; the second eigenvalue controls the convergence speed."},
+{t:"la",d:3,q:"True or false, with justification: (a) If A and B are invertible then A + B is invertible. (b) (AB)<sup>&minus;1</sup> = B<sup>&minus;1</sup>A<sup>&minus;1</sup>. (c) det(A + B) = det(A) + det(B).",
+h1:"For (a) and (c), try the simplest possible counterexamples.",
+h2:"Try B = &minus;A for (a); try A = B = I in 2&times;2 for (c).",
+a:"(a) False: A = I, B = &minus;I are invertible but A + B = 0 is not. (b) True: (AB)(B<sup>&minus;1</sup>A<sup>&minus;1</sup>) = A(BB<sup>&minus;1</sup>)A<sup>&minus;1</sup> = I; note the order reversal. (c) False: with A = B = I (2&times;2), det(A+B) = det(2I) = 4 but det(A) + det(B) = 2. Determinant is multiplicative, det(AB) = det(A)det(B), but not additive."},
+{t:"la",d:3,q:"What does it mean for a matrix to be positive definite? Give two equivalent characterizations and one reason positive definiteness matters in optimization.",
+h1:"One characterization uses x<sup>T</sup>Ax, another uses eigenvalues.",
+h2:"Recall the second-order condition for a local minimum in several variables.",
+a:"A symmetric A is positive definite if x<sup>T</sup>Ax &gt; 0 for all x &ne; 0. Equivalent: all eigenvalues are positive; all leading principal minors are positive (Sylvester); A = R<sup>T</sup>R for an invertible R (Cholesky exists). In optimization: if &nabla;f(x*) = 0 and the Hessian at x* is positive definite, x* is a strict local minimum; positive definite Hessians also make Newton steps descent directions and guarantee unique minimizers of quadratic forms."},
+// ---------- PROBABILITY ----------
+{t:"prob",d:1,q:"Two fair dice are rolled. What is the probability that the sum equals 7? Explain your sample space.",
+h1:"How many equally likely outcomes are there in total?",
+h2:"List the ordered pairs summing to 7.",
+a:"The sample space has 6&times;6 = 36 equally likely ordered outcomes. Pairs summing to 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) &mdash; six of them. P = 6/36 = 1/6. Note 7 is the most likely sum precisely because it has the most combinations."},
+{t:"prob",d:1,q:"Conceptual: what is the difference between independent events and mutually exclusive (disjoint) events? Can two events with positive probability be both?",
+h1:"Write both definitions with formulas.",
+h2:"If A and B are disjoint, what is P(A &cap; B)? Compare with independence.",
+a:"Independent: P(A &cap; B) = P(A)P(B) &mdash; knowing one occurred does not change the probability of the other. Disjoint: A &cap; B = &empty;, so P(A &cap; B) = 0 &mdash; they cannot both happen. If both had positive probability and were disjoint, independence would require P(A)P(B) = 0, a contradiction. So events with positive probability can never be both; disjoint events are in fact strongly dependent."},
+{t:"prob",d:1,q:"A fair coin is tossed 3 times. Let X be the number of heads. Write the probability mass function of X and compute E[X].",
+h1:"X follows a binomial distribution.",
+h2:"P(X = k) = C(3,k)(1/2)&sup3;.",
+a:"X ~ Binomial(3, 1/2): P(X=0) = 1/8, P(X=1) = 3/8, P(X=2) = 3/8, P(X=3) = 1/8. E[X] = &Sigma;k&middot;P(X=k) = 0 + 3/8&middot;1 + 3/8&middot;2 + 1/8&middot;3 = 12/8 = 1.5, matching the formula E = np = 3&middot;(1/2)."},
+{t:"prob",d:1,q:"Conceptual: what conditions must a function f satisfy to be a valid probability density function (PDF)? Why can f(x) exceed 1?",
+h1:"Two conditions: sign and total integral.",
+h2:"For a continuous variable, probabilities are areas, not heights.",
+a:"f must satisfy f(x) &ge; 0 for all x, and &int;<sub>&minus;&infin;</sub><sup>&infin;</sup> f(x)dx = 1. f(x) is a density, not a probability: P(a &le; X &le; b) = &int;<sub>a</sub><sup>b</sup>f(x)dx, and P(X = x) = 0 for any single point. Heights can exceed 1 as long as total area is 1 &mdash; e.g. the uniform density on [0, 1/2] is f(x) = 2."},
+{t:"prob",d:1,q:"Cards: you draw 2 cards from a standard 52-card deck without replacement. What is the probability both are aces?",
+h1:"Multiply conditional probabilities: P(first ace) &times; P(second ace | first ace).",
+h2:"After removing one ace, 3 aces remain among 51 cards.",
+a:"P = (4/52)&middot;(3/51) = 12/2652 = 1/221 &asymp; 0.0045. Equivalently by counting: C(4,2)/C(52,2) = 6/1326 = 1/221. The key point is that without replacement the second draw is conditioned on the first."},
+{t:"prob",d:1,q:"X is uniform on [0, 4]. Compute P(1 &le; X &le; 3), E[X], and Var(X).",
+h1:"The uniform density on [a,b] is 1/(b&minus;a).",
+h2:"For Uniform(a,b): mean (a+b)/2, variance (b&minus;a)&sup2;/12.",
+a:"Density f(x) = 1/4 on [0,4]. P(1 &le; X &le; 3) = (3&minus;1)/4 = 1/2. E[X] = (0+4)/2 = 2. Var(X) = (4&minus;0)&sup2;/12 = 4/3. (Variance can be derived from E[X&sup2;] = &int;<sub>0</sub><sup>4</sup>x&sup2;/4 dx = 16/3, so Var = 16/3 &minus; 4 = 4/3.)"},
+{t:"prob",d:2,q:"A test for a disease is 99% sensitive (detects sick people) and 95% specific (correctly clears healthy people). The disease affects 1% of the population. Given a positive test, what is the probability the person is actually sick?",
+h1:"This is Bayes&rsquo; theorem. Write P(sick | +) in terms of P(+ | sick), P(sick), and P(+).",
+h2:"P(+) = P(+|sick)P(sick) + P(+|healthy)P(healthy) = 0.99&middot;0.01 + 0.05&middot;0.99.",
+a:"Bayes: P(sick|+) = P(+|sick)P(sick) / P(+). Numerator: 0.99 &times; 0.01 = 0.0099. Denominator: 0.0099 + 0.05 &times; 0.99 = 0.0099 + 0.0495 = 0.0594. So P(sick|+) = 0.0099/0.0594 &asymp; 0.167 &mdash; only about 17%, despite the accurate test, because the disease is rare and false positives from the large healthy population dominate. This is the base-rate effect."},
+{t:"prob",d:2,q:"X has PDF f(x) = cx&sup2; on [0, 2] and 0 elsewhere. Find c, then compute P(X &gt; 1) and E[X].",
+h1:"Use the normalization condition to find c.",
+h2:"&int;<sub>0</sub><sup>2</sup> cx&sup2;dx = 8c/3 = 1.",
+a:"Normalization: c&middot;8/3 = 1, so c = 3/8. P(X &gt; 1) = &int;<sub>1</sub><sup>2</sup>(3/8)x&sup2;dx = (1/8)(8 &minus; 1) = 7/8. E[X] = &int;<sub>0</sub><sup>2</sup>x&middot;(3/8)x&sup2;dx = (3/32)&middot;16 = 3/2."},
+{t:"prob",d:2,q:"You toss a fair coin repeatedly. What is the expected number of tosses until the first head? Derive it, do not just state it.",
+h1:"Let E be the expected number and condition on the first toss.",
+h2:"E = 1 + (1/2)&middot;0 + (1/2)&middot;E &mdash; explain each term.",
+a:"Let E be the expected number of tosses. Condition on the first toss: with probability 1/2 it is a head and we are done after 1 toss; with probability 1/2 it is a tail and, by memorylessness, we expect E more tosses. So E = (1/2)(1) + (1/2)(1 + E), giving E = 1 + E/2, so E = 2. In general the geometric distribution with success probability p has mean 1/p."},
+{t:"prob",d:2,q:"Conceptual: state the law of total probability and Bayes&rsquo; theorem, and explain how they relate.",
+h1:"Partition the sample space into events B<sub>1</sub>, &hellip;, B<sub>n</sub>.",
+h2:"Bayes reverses the conditioning; total probability supplies its denominator.",
+a:"Law of total probability: for a partition B<sub>1</sub>,&hellip;,B<sub>n</sub>, P(A) = &Sigma; P(A|B<sub>i</sub>)P(B<sub>i</sub>). Bayes: P(B<sub>j</sub>|A) = P(A|B<sub>j</sub>)P(B<sub>j</sub>) / &Sigma; P(A|B<sub>i</sub>)P(B<sub>i</sub>). Total probability computes the marginal P(A) by cases; Bayes then reverses the conditioning &mdash; from the likelihood P(A|B) to the posterior P(B|A) &mdash; using that marginal as the normalizer."},
+{t:"prob",d:2,q:"Two fair dice: given that the sum is at least 10, what is the probability that at least one die shows a 6?",
+h1:"This is conditional probability: restrict the sample space to sums &ge; 10.",
+h2:"List outcomes with sum 10, 11, 12; count those containing a 6.",
+a:"Outcomes with sum &ge; 10: (4,6),(5,5),(5,6),(6,4),(6,5),(6,6) &mdash; 6 outcomes. Those containing a 6: all except (5,5) &mdash; 5 outcomes. P = 5/6. Formally P(A|B) = P(A &cap; B)/P(B) = (5/36)/(6/36) = 5/6."},
+{t:"prob",d:2,q:"X ~ N(&mu;, &sigma;&sup2;). What is the distribution of Z = (X &minus; &mu;)/&sigma;, and why is this transformation useful? Roughly what fraction of values fall within 1, 2, and 3 standard deviations of the mean?",
+h1:"Linear transformations of normal variables are normal.",
+h2:"Recall the 68&ndash;95&ndash;99.7 rule.",
+a:"Z ~ N(0, 1), the standard normal: subtracting &mu; centers it, dividing by &sigma; scales it. This standardization lets any normal probability be looked up from one table/function: P(a &lt; X &lt; b) = &Phi;((b&minus;&mu;)/&sigma;) &minus; &Phi;((a&minus;&mu;)/&sigma;). Empirical rule: about 68% within 1&sigma;, 95% within 2&sigma;, 99.7% within 3&sigma;."},
+{t:"prob",d:2,q:"A bag has 3 red and 5 blue balls. You draw balls one at a time without replacement until you get a red one. What is the probability you need exactly 3 draws?",
+h1:"You need blue, blue, then red.",
+h2:"Multiply conditional probabilities as the bag shrinks.",
+a:"P(B,B,R) = (5/8)&middot;(4/7)&middot;(3/6) = 60/336 = 5/28 &asymp; 0.179. Each factor conditions on the previous draws: after two blues are removed, 3 reds remain among 6 balls."},
+{t:"prob",d:3,q:"Derive the expectation and variance of a Bernoulli(p) variable, then use them to obtain the mean and variance of a Binomial(n, p).",
+h1:"Bernoulli: X takes value 1 with probability p, else 0. Compute E[X] and E[X&sup2;] directly.",
+h2:"A binomial is a sum of n independent Bernoullis; variance adds over independent variables.",
+a:"Bernoulli: E[X] = 1&middot;p + 0&middot;(1&minus;p) = p; E[X&sup2;] = p (since X&sup2; = X), so Var = p &minus; p&sup2; = p(1&minus;p). Binomial: S = X<sub>1</sub> + &hellip; + X<sub>n</sub> with independent Bernoulli(p) terms. Linearity: E[S] = np. Independence: Var(S) = &Sigma;Var(X<sub>i</sub>) = np(1&minus;p). Note linearity of expectation needs no independence, but adding variances does."},
+{t:"prob",d:3,q:"The Monty Hall problem: 3 doors, one prize. You pick a door; the host, who knows where the prize is, opens a different door that is empty and offers a switch. Should you switch? Justify with probabilities.",
+h1:"What is the probability your first pick was right? Does the host&rsquo;s action change that?",
+h2:"Condition on the two cases: first pick correct (prob 1/3) vs wrong (prob 2/3). What does switching do in each?",
+a:"Switch. Your initial pick is correct with probability 1/3. If it was correct (1/3), switching loses. If it was wrong (2/3), the host is forced to reveal the only other empty door, so switching wins. Hence P(win | switch) = 2/3 vs P(win | stay) = 1/3. The key assumption is that the host always opens an empty, unchosen door &mdash; his choice leaks information."},
+{t:"prob",d:3,q:"X has PDF f(x) = &lambda;e<sup>&minus;&lambda;x</sup> for x &ge; 0 (exponential). Derive its CDF, mean, and the memoryless property P(X &gt; s + t | X &gt; s) = P(X &gt; t).",
+h1:"CDF by integrating the PDF; mean by parts. For memorylessness use the survival function P(X &gt; x) = e<sup>&minus;&lambda;x</sup>.",
+h2:"P(X &gt; s+t | X &gt; s) = P(X &gt; s+t)/P(X &gt; s).",
+a:"CDF: F(x) = 1 &minus; e<sup>&minus;&lambda;x</sup> for x &ge; 0. Mean: E[X] = &int;<sub>0</sub><sup>&infin;</sup>x&lambda;e<sup>&minus;&lambda;x</sup>dx = 1/&lambda; (by parts, or via &int;P(X&gt;x)dx). Memorylessness: P(X &gt; s+t | X &gt; s) = e<sup>&minus;&lambda;(s+t)</sup>/e<sup>&minus;&lambda;s</sup> = e<sup>&minus;&lambda;t</sup> = P(X &gt; t). The exponential is the only continuous distribution with this property &mdash; the process does not age."},
+{t:"prob",d:3,q:"State the Law of Large Numbers and the Central Limit Theorem, and explain the different questions they answer about the sample mean.",
+h1:"One is about where the sample mean goes; the other about the shape of its fluctuations.",
+h2:"CLT: &radic;n( X&#772; &minus; &mu;)/&sigma; converges in distribution to N(0,1).",
+a:"LLN: for i.i.d. X<sub>i</sub> with mean &mu;, the sample mean X&#772;<sub>n</sub> converges to &mu; as n &rarr; &infin; (in probability / almost surely) &mdash; it says where the average settles. CLT: if the variance &sigma;&sup2; is finite, &radic;n(X&#772;<sub>n</sub> &minus; &mu;)/&sigma; &rarr; N(0,1) in distribution &mdash; it describes the shape and size (order 1/&radic;n) of fluctuations around &mu;, regardless of the original distribution. LLN justifies estimating means by averaging; CLT justifies normal-based confidence intervals."},
+{t:"prob",d:3,q:"In a room of 23 people, what is the probability that at least two share a birthday (365 equally likely days)? Set up the computation and give the approximate answer.",
+h1:"Compute the complement: probability all birthdays are distinct.",
+h2:"P(all distinct) = 365/365 &times; 364/365 &times; &hellip; &times; 343/365.",
+a:"P(shared) = 1 &minus; P(all distinct) = 1 &minus; &Pi;<sub>k=0</sub><sup>22</sup>(365&minus;k)/365 &asymp; 1 &minus; 0.493 = 0.507. With just 23 people the probability already exceeds 1/2 because what matters is the number of pairs, C(23,2) = 253, each a chance for a collision. This &lsquo;birthday paradox&rsquo; underlies hash-collision analysis in computer science."},
+{t:"prob",d:3,q:"Random variables X and Y have joint density f(x,y) = 2 on the triangle 0 &le; y &le; x &le; 1. Find the marginal density of X, and determine whether X and Y are independent.",
+h1:"Marginal: integrate the joint density over y for fixed x.",
+h2:"Independence requires the joint density to factor into g(x)h(y) on a rectangular support.",
+a:"f<sub>X</sub>(x) = &int;<sub>0</sub><sup>x</sup>2 dy = 2x for 0 &le; x &le; 1. Similarly f<sub>Y</sub>(y) = &int;<sub>y</sub><sup>1</sup>2 dx = 2(1&minus;y). Not independent: f<sub>X</sub>(x)f<sub>Y</sub>(y) = 4x(1&minus;y) &ne; 2 = f(x,y); more fundamentally, the support is a triangle, not a product of intervals &mdash; knowing X = 0.1 restricts Y to [0, 0.1]."},
+{t:"prob",d:3,q:"You roll a fair die repeatedly and sum the results. Roughly, what is the distribution of the sum S<sub>n</sub> after n = 100 rolls? Give its approximate mean, variance, and the probability that S<sub>100</sub> exceeds 380.",
+h1:"One roll has mean 3.5 and variance 35/12. What theorem applies to large sums?",
+h2:"S<sub>100</sub> &asymp; N(350, 100&middot;35/12); standardize 380.",
+a:"Single roll: &mu; = 3.5, &sigma;&sup2; = E[X&sup2;] &minus; &mu;&sup2; = 91/6 &minus; 12.25 = 35/12. By the CLT, S<sub>100</sub> is approximately N(350, 3500/12 &asymp; 291.7), sd &asymp; 17.1. P(S &gt; 380) &asymp; P(Z &gt; (380&minus;350)/17.1) = P(Z &gt; 1.76) &asymp; 0.039, i.e. about 4%."},
+// ---------- DATA STRUCTURES & ALGORITHMS ----------
+{t:"dsa",d:1,q:"Define Big-O notation precisely. Then rank these growth rates from slowest to fastest growing: n log n, 2<sup>n</sup>, n&sup2;, log n, n, n!.",
+h1:"f(n) = O(g(n)) means f is eventually bounded above by a constant times g.",
+h2:"Logarithms grow slower than any polynomial; exponentials slower than factorials.",
+a:"f(n) = O(g(n)) iff there exist constants c &gt; 0 and n<sub>0</sub> such that f(n) &le; c&middot;g(n) for all n &ge; n<sub>0</sub> &mdash; an asymptotic upper bound ignoring constants. Order: log n &lt; n &lt; n log n &lt; n&sup2; &lt; 2<sup>n</sup> &lt; n!."},
+{t:"dsa",d:1,q:"What is the time complexity of binary search, and what precondition must the input satisfy? Walk through searching for 7 in [1, 3, 5, 7, 9, 11].",
+h1:"Each comparison halves the search interval.",
+h2:"Start with the middle element of the whole array.",
+a:"O(log n), and the array must be sorted. Trace: interval [0..5], mid = 2 (value 5) &lt; 7 &rarr; search right half [3..5]; mid = 4 (value 9) &gt; 7 &rarr; search [3..3]; mid = 3 (value 7) &mdash; found, 3 comparisons. Recurrence T(n) = T(n/2) + O(1) = O(log n)."},
+{t:"dsa",d:1,q:"Compare arrays and linked lists: what are the complexities of (a) access by index, (b) insertion at the front, (c) insertion at the end, and when would you prefer each structure?",
+h1:"Arrays give contiguous memory; lists give pointer-chained nodes.",
+h2:"Consider what must move or be traversed for each operation.",
+a:"Array: access O(1); front insertion O(n) (shift everything); end insertion O(1) amortized for dynamic arrays. Singly linked list: access O(n); front insertion O(1); end insertion O(1) with a tail pointer, else O(n). Prefer arrays for random access and cache locality; lists for frequent insertions/deletions at known positions without shifting. In practice arrays often win even for middle insertions because of cache effects."},
+{t:"dsa",d:1,q:"Conceptual: what property defines a binary search tree (BST)? What is the complexity of search in the best and worst case, and what causes the worst case?",
+h1:"The property constrains all nodes in each subtree, not just the children.",
+h2:"What shape does the tree take if you insert sorted data?",
+a:"For every node, all keys in its left subtree are smaller and all keys in its right subtree are larger. Search follows one root-to-leaf path: O(h) where h is the height &mdash; O(log n) for a balanced tree, but O(n) worst case when the tree degenerates into a chain (e.g. inserting keys in sorted order). Self-balancing trees (AVL, red-black) guarantee h = O(log n)."},
+{t:"dsa",d:1,q:"What does a stack&rsquo;s LIFO discipline mean, and give two classic uses of stacks in computing. How would you check whether a string of brackets like ([]{}) is balanced?",
+h1:"Last In, First Out. Think about function calls and undo.",
+h2:"Push opening brackets; on a closing bracket, compare with the top.",
+a:"LIFO: the last element pushed is the first popped. Uses: the call stack for function invocation/recursion, expression evaluation, undo history, DFS. Balanced brackets: scan left to right; push every opener; for each closer, the stack must be non-empty and its top must be the matching opener (pop it), otherwise unbalanced; at the end the stack must be empty. O(n) time, O(n) space."},
+{t:"dsa",d:1,q:"Explain how selection sort works, give its time complexity, and state one reason it is almost never used in practice.",
+h1:"Repeatedly pick the minimum of the unsorted part.",
+h2:"Count the comparisons: (n&minus;1) + (n&minus;2) + &hellip;",
+a:"Selection sort scans the unsorted suffix for its minimum and swaps it into place, growing a sorted prefix. Comparisons: n(n&minus;1)/2 = O(n&sup2;) in all cases &mdash; even on sorted input. It is simple and does only O(n) swaps, but O(n&sup2;) always; insertion sort beats it on nearly-sorted data (O(n) best case) and O(n log n) sorts dominate for large n."},
+{t:"dsa",d:2,q:"Explain merge sort: the algorithm, its recurrence, and the resulting complexity. Why is it preferred over quicksort in some settings?",
+h1:"Divide the array in half, sort each half recursively, then merge.",
+h2:"T(n) = 2T(n/2) + O(n). What does the recursion tree sum to?",
+a:"Merge sort splits the array in halves, recursively sorts them, and merges the two sorted halves in linear time. Recurrence T(n) = 2T(n/2) + O(n); the recursion tree has log n levels each costing O(n), so O(n log n) &mdash; worst case included. It is also stable. Preferred when worst-case guarantees matter (quicksort is O(n&sup2;) worst case), for external/linked-list sorting, and when stability is required; its cost is O(n) extra memory."},
+{t:"dsa",d:2,q:"Given an unsorted array of n integers and a target sum s, design an O(n) average-time algorithm to decide whether two distinct elements sum to s. Explain the data structure that makes this possible.",
+h1:"Brute force is O(n&sup2;). What structure gives O(1) average lookup?",
+h2:"For each element x, check whether s &minus; x has already been seen.",
+a:"Use a hash set. Scan once: for each x, if (s &minus; x) is in the set, answer yes; otherwise insert x. One pass with O(1) average insert/lookup gives O(n) average time, O(n) space. Alternative: sort then two-pointer scan &mdash; O(n log n) time but O(1) extra space. Mentioning the trade-off is what interviewers want."},
+{t:"dsa",d:2,q:"Explain BFS and DFS on a graph: how each works, their complexities, and one problem each is naturally suited for.",
+h1:"One uses a queue, the other a stack (or recursion).",
+h2:"Which one explores level by level and finds shortest paths in unweighted graphs?",
+a:"BFS explores in expanding layers using a queue; DFS follows a path as deep as possible before backtracking, using recursion or an explicit stack. Both run in O(V + E) with adjacency lists. BFS naturally computes shortest paths (fewest edges) in unweighted graphs and level structure. DFS naturally supports cycle detection, topological sorting, and identifying connected/strongly connected components."},
+{t:"dsa",d:2,q:"Write (in pseudocode) a function to reverse a singly linked list in O(n) time and O(1) extra space, and explain the pointer manipulation.",
+h1:"Keep three pointers: previous, current, next.",
+h2:"At each step save current.next, point current.next to previous, then advance.",
+a:"prev = null; cur = head; while cur &ne; null: { nxt = cur.next; cur.next = prev; prev = cur; cur = nxt } return prev. Each node&rsquo;s next pointer is flipped exactly once. We must save nxt before overwriting cur.next or the rest of the list is lost. Time O(n), space O(1). (Recursive reversal is elegant but uses O(n) stack space.)"},
+{t:"dsa",d:2,q:"What is a min-heap? Give the complexities of insert, extract-min, and peek-min, and explain how a heap is stored in an array.",
+h1:"A complete binary tree where each parent &le; its children.",
+h2:"Node i has children at 2i+1 and 2i+2 (0-indexed). Insertions bubble up; extractions sift down.",
+a:"A min-heap is a complete binary tree with each node &le; its children, so the minimum is at the root. Stored implicitly in an array: children of index i at 2i+1, 2i+2; parent at &lfloor;(i&minus;1)/2&rfloor; &mdash; no pointers needed. Peek-min O(1); insert O(log n) (append, bubble up); extract-min O(log n) (move last element to root, sift down). Building a heap from n items takes O(n). Heaps implement priority queues, e.g. in Dijkstra and heapsort."},
+{t:"dsa",d:2,q:"Conceptual: what is the difference between worst-case, average-case, and amortized complexity? Illustrate amortized analysis with dynamic array (e.g. Python list) appends.",
+h1:"Amortized averages cost over a sequence of operations, not over random inputs.",
+h2:"Most appends are O(1); occasionally the array doubles and copies all n elements.",
+a:"Worst case bounds a single operation on the worst input; average case takes expectation over an input distribution; amortized bounds the average cost per operation over any sequence, with no randomness. Dynamic arrays: an append is usually O(1), but when capacity is full the array doubles, costing O(n). Over n appends the total copy work is n/2 + n/4 + &hellip; &lt; n, so total O(n) and amortized O(1) per append &mdash; even though an individual append can be O(n)."},
+{t:"dsa",d:3,q:"Explain quicksort: partitioning, best/average/worst-case complexities, and how the worst case is avoided in practice.",
+h1:"A pivot splits the array into smaller-than and larger-than parts.",
+h2:"What happens when the pivot is always the smallest element? How do you make that unlikely?",
+a:"Quicksort picks a pivot, partitions the array so smaller elements precede it and larger follow, then recurses on both sides. Balanced partitions give T(n) = 2T(n/2) + O(n) = O(n log n); the average case is also O(n log n). Worst case O(n&sup2;) occurs with consistently unbalanced partitions (e.g. sorted input with first-element pivot). Remedies: random pivot or median-of-three, making worst case vanishingly unlikely; introsort switches to heapsort beyond a depth limit. In-place and cache-friendly, but not stable."},
+{t:"dsa",d:3,q:"Describe Dijkstra&rsquo;s algorithm: what problem it solves, how it works, its complexity with a binary heap, and the key assumption on edge weights. Why does it fail with negative edges?",
+h1:"It greedily finalizes the closest unvisited vertex.",
+h2:"Once a vertex is finalized, its distance is assumed final. What could a negative edge do to that assumption?",
+a:"Dijkstra computes single-source shortest paths in a weighted graph with non-negative edges. Maintain tentative distances; repeatedly extract the unvisited vertex with smallest distance (a priority queue), finalize it, and relax its outgoing edges. With a binary heap: O((V + E) log V). The greedy step is only valid because with non-negative weights no later path can improve a finalized vertex; a negative edge could shorten a path to an already-finalized vertex, breaking correctness. For negative edges use Bellman-Ford (O(VE)), which also detects negative cycles."},
+{t:"dsa",d:3,q:"Solve the classic problem: find the maximum sum of any contiguous subarray of an array containing negative numbers (e.g. [&minus;2, 1, &minus;3, 4, &minus;1, 2, 1, &minus;5, 4]). Give an O(n) algorithm and explain why it works.",
+h1:"Consider the best subarray ending at each position i.",
+h2:"best_ending_here = max(a[i], best_ending_here + a[i]) &mdash; Kadane&rsquo;s algorithm.",
+a:"Kadane&rsquo;s algorithm: keep cur = best sum of a subarray ending at i, and best = global max. cur = max(a[i], cur + a[i]); best = max(best, cur). The recurrence works because the best subarray ending at i either extends the best one ending at i&minus;1 or starts fresh at i &mdash; a dynamic-programming argument. For the example the answer is 6 (subarray [4, &minus;1, 2, 1]). O(n) time, O(1) space."},
+{t:"dsa",d:3,q:"What is a topological sort? On what graphs does it exist, describe an algorithm to compute one, and give a real scenario where it is needed.",
+h1:"It linearly orders vertices so every edge points forward.",
+h2:"Kahn&rsquo;s algorithm: repeatedly remove vertices with in-degree 0. What if none exists but vertices remain?",
+a:"A topological order of a directed graph lists vertices so that for every edge u &rarr; v, u appears before v. It exists iff the graph is a DAG (no directed cycles). Kahn&rsquo;s algorithm: compute in-degrees, enqueue all in-degree-0 vertices, repeatedly dequeue one, output it, and decrement its neighbors&rsquo; in-degrees, enqueuing new zeros &mdash; O(V + E). If output has fewer than V vertices, a cycle exists. Alternative: DFS finish-time order reversed. Uses: build systems and course-prerequisite ordering, task scheduling, resolving package dependencies."},
+{t:"dsa",d:3,q:"Compare hash tables and balanced BSTs for implementing a dictionary: complexities for search/insert/delete, and situations where each is the right choice.",
+h1:"One gives O(1) average; the other O(log n) guaranteed &mdash; plus something extra.",
+h2:"Which supports ordered iteration, range queries, and predecessor queries?",
+a:"Hash table: O(1) average (O(n) worst case with collisions/bad hashing) for search/insert/delete; no order. Balanced BST (AVL/red-black): O(log n) worst case for all three, and maintains sorted order &mdash; supporting in-order traversal, min/max, predecessor/successor, and range queries. Choose hashing for raw point-lookup speed; choose trees when ordering matters, when worst-case guarantees are required, or for range operations. (This mirrors dict vs sorted containers, or hash indexes vs B-tree indexes in databases.)"},
+{t:"dsa",d:3,q:"Detect whether an undirected graph contains a cycle. Give an algorithm, its complexity, and explain the subtlety compared with directed graphs.",
+h1:"DFS: what does it mean to reach an already-visited vertex?",
+h2:"In an undirected graph, seeing your own parent again is not a cycle.",
+a:"Run DFS; if you encounter a visited vertex that is not the parent of the current vertex, there is a cycle. O(V + E). Subtlety: the edge back to the DFS parent is the same undirected edge you arrived by, so it must be excluded. Alternative: union-find &mdash; process each edge, and if both endpoints are already in the same set, a cycle exists (near O(1) amortized per edge with path compression). In directed graphs one instead tracks the recursion stack (back edge to a gray vertex)."},
+{t:"dsa",d:3,q:"You need the k largest elements of a stream of n numbers (n huge, k small). Design an algorithm, state its complexity, and compare it with sorting.",
+h1:"Keep only the k best seen so far &mdash; in a structure that quickly exposes the weakest of them.",
+h2:"A min-heap of size k: when a new element beats the heap minimum, replace it.",
+a:"Maintain a min-heap of size k holding the k largest so far. For each new element: if it exceeds the heap min, pop and push &mdash; O(log k) per element, total O(n log k), memory O(k). Full sorting costs O(n log n) time and O(n) memory and needs all data at once, while the heap works on-line over a stream. For k = 1 this degenerates to a simple running maximum; quickselect gives O(n) average if all data fits in memory."},
+{t:"dsa",d:3,q:"Explain dynamic programming: the two key properties a problem needs, and the difference between top-down memoization and bottom-up tabulation. Illustrate with Fibonacci: complexity with and without memoization.",
+h1:"The properties are optimal substructure and overlapping subproblems.",
+h2:"Naive Fibonacci recomputes the same subproblems: its recursion tree has ~&phi;<sup>n</sup> nodes.",
+a:"DP applies when a problem has optimal substructure (optimal solutions built from optimal sub-solutions) and overlapping subproblems (the same subproblems recur). Top-down: recurse but cache results (memoization). Bottom-up: fill a table from base cases (tabulation), often enabling space optimization. Fibonacci: naive recursion is O(&phi;<sup>n</sup>) &mdash; exponential &mdash; because F(n&minus;2) is computed twice, F(n&minus;3) three times, etc.; with memoization each of the n subproblems is solved once: O(n) time, and bottom-up needs only two variables: O(1) space."},
+// ---------- OPERATING SYSTEMS ----------
+{t:"os",d:1,q:"What is the difference between a process and a thread? What do threads of the same process share, and what do they each have privately?",
+h1:"A process is a running program with its own address space.",
+h2:"Threads share memory but each needs its own execution state.",
+a:"A process is an executing program with its own virtual address space, file descriptors, and resources. A thread is a unit of execution within a process. Threads of one process share the address space (code, heap, globals) and open files; each thread has its own program counter, registers, and stack. Consequences: thread creation and context switching are cheaper, and threads communicate through shared memory &mdash; which is fast but requires synchronization; processes are isolated, so one crashing does not corrupt another."},
+{t:"os",d:1,q:"Describe the main process states and the transitions between them.",
+h1:"Think: new, ready, running, waiting/blocked, terminated.",
+h2:"What event moves a process from running to blocked? From blocked to ready?",
+a:"New (being created) &rarr; Ready (waiting for CPU) &rarr; Running (executing). Running &rarr; Blocked/Waiting when it requests I/O or waits on an event; Blocked &rarr; Ready when the event completes (not directly back to Running). Running &rarr; Ready on a timer interrupt/preemption. Running &rarr; Terminated on exit. Key insight: a blocked process cannot be scheduled no matter how idle the CPU is &mdash; it is waiting for something other than the CPU."},
+{t:"os",d:1,q:"What is a context switch? What does the OS save and restore, and why are frequent context switches costly?",
+h1:"The CPU must be able to resume the old process later exactly where it stopped.",
+h2:"Beyond saved registers, think about caches and the TLB.",
+a:"A context switch suspends one process/thread and resumes another: the kernel saves the CPU context (program counter, registers, stack pointer) into the process control block and loads the next one; switching processes also changes the address space (page table base register). Costs: the direct save/restore work, plus indirect costs &mdash; cache and TLB entries of the old process become useless (cold caches), and pipeline state is lost. Excessive switching means the CPU spends its time on overhead instead of useful work."},
+{t:"os",d:1,q:"Conceptual: what problem does virtual memory solve? Name three distinct benefits it provides.",
+h1:"Programs see addresses that are not physical addresses.",
+h2:"Think: isolation, size illusion, sharing.",
+a:"Virtual memory gives each process its own private address space, translated to physical frames by the MMU via page tables. Benefits: (1) isolation/protection &mdash; a process cannot touch another&rsquo;s memory; (2) the illusion of a large contiguous memory &mdash; programs can exceed physical RAM, with rarely-used pages swapped to disk; (3) efficient sharing &mdash; shared libraries and copy-on-write fork map the same frames into multiple processes; (4) simpler loading &mdash; no need for contiguous physical allocation, eliminating external fragmentation of RAM."},
+{t:"os",d:1,q:"Compare First-Come-First-Served (FCFS) and Round Robin scheduling. What is the convoy effect?",
+h1:"FCFS runs each job to completion in arrival order; RR gives each a time slice.",
+h2:"What happens in FCFS when a long CPU-bound job arrives before many short ones?",
+a:"FCFS is non-preemptive: jobs run in arrival order &mdash; simple, no starvation, but poor response time. The convoy effect: one long job at the head makes all short jobs behind it wait, inflating average waiting time. Round Robin preempts every time quantum and cycles through the ready queue: good responsiveness and fairness for interactive workloads, at the cost of context-switch overhead; a too-large quantum degenerates to FCFS, a too-small one wastes CPU on switching."},
+{t:"os",d:1,q:"What is the purpose of a file system? Explain the difference between a file&rsquo;s data and its metadata, giving examples of metadata.",
+h1:"The disk is just a huge array of blocks; the file system imposes structure.",
+h2:"Metadata is information about the file, stored (in Unix) in an inode.",
+a:"A file system organizes raw storage blocks into named files and directories, managing allocation, free space, naming, and protection. Data is the file&rsquo;s content; metadata describes the file: size, owner, permissions, timestamps, link count, and &mdash; crucially &mdash; the locations of its data blocks. In Unix this lives in the inode; the file name itself is not in the inode but in directory entries mapping names to inode numbers, which is why hard links (multiple names for one inode) are possible."},
+{t:"os",d:2,q:"What is a race condition? Give a concrete example of two threads incrementing a shared counter, and show how the wrong result arises.",
+h1:"counter++ is not one instruction.",
+h2:"Interleave the load-increment-store sequences of two threads.",
+a:"A race condition occurs when the result depends on the timing/interleaving of concurrent operations on shared state. counter++ compiles to load, add, store. With counter = 5: thread A loads 5; thread B loads 5; A stores 6; B stores 6 &mdash; two increments, but the counter shows 6, not 7; one update is lost. The fix is mutual exclusion: make the read-modify-write atomic via a lock or an atomic instruction, so only one thread executes the critical section at a time."},
+{t:"os",d:2,q:"State the four necessary conditions for deadlock (Coffman conditions), and for each one, sketch how breaking it prevents deadlock.",
+h1:"Mutual exclusion, hold-and-wait, no preemption, circular wait.",
+h2:"The most practical to break is circular wait &mdash; think about lock ordering.",
+a:"(1) Mutual exclusion: resources are non-shareable &mdash; hard to break for things like locks. (2) Hold and wait: a process holds resources while waiting for more &mdash; break by requesting all resources at once. (3) No preemption: resources cannot be forcibly taken &mdash; break by releasing held resources on a failed request (e.g. trylock with backoff). (4) Circular wait: a cycle of processes each waiting for the next &mdash; break by imposing a global ordering on resources and acquiring them in order, the most common practical technique. All four must hold simultaneously for deadlock; removing any one prevents it."},
+{t:"os",d:2,q:"Explain paging: pages, frames, and how a virtual address is translated to a physical address. With 4 KB pages and 32-bit addresses, how is an address split?",
+h1:"Virtual memory is divided into fixed-size pages, physical memory into same-size frames.",
+h2:"4 KB = 2&sup1;&sup2;, so how many bits index within a page?",
+a:"Virtual memory is split into fixed-size pages (here 4 KB), physical memory into equal frames. A virtual address splits into a page number and an offset: with 32-bit addresses and 4 KB pages, offset = 12 bits, page number = 20 bits (about a million pages). The page table maps page number &rarr; frame number; the physical address is the frame number concatenated with the unchanged offset. Each entry also carries valid, protection, dirty, and referenced bits used for protection and page replacement."},
+{t:"os",d:2,q:"What is a TLB and why is it essential? What happens on a TLB miss, and how does the TLB interact with context switches?",
+h1:"Without it, every memory access would require extra memory accesses to walk the page table.",
+h2:"On a switch to a different address space, cached translations become wrong.",
+a:"The Translation Lookaside Buffer is a small hardware cache of recent virtual-to-physical page translations. Without it a memory reference would need one or more page-table accesses (more with multi-level tables), multiplying memory traffic; with locality, TLB hit rates above 99% make translation nearly free. On a miss, the hardware (or OS) walks the page table and fills the entry. On a context switch, translations belong to the old address space, so the TLB must be flushed &mdash; unless entries are tagged with address-space IDs (ASIDs) &mdash; which is a major hidden cost of switching."},
+{t:"os",d:2,q:"Compare the page replacement algorithms FIFO, LRU, and Optimal. Which is realizable, which is a benchmark, and what is Belady&rsquo;s anomaly?",
+h1:"Optimal evicts the page used farthest in the future.",
+h2:"For FIFO, adding more frames can &mdash; surprisingly &mdash; increase page faults on some reference strings.",
+a:"Optimal (evict the page whose next use is farthest away) minimizes faults but needs future knowledge &mdash; it is the benchmark. LRU evicts the least recently used page, approximating Optimal via temporal locality; exact LRU is costly, so systems approximate it (reference bits, clock algorithm). FIFO evicts the oldest-loaded page &mdash; cheap but can evict hot pages, and exhibits Belady&rsquo;s anomaly: for some reference strings, more frames produce more faults. LRU is a stack algorithm and provably never shows the anomaly."},
+{t:"os",d:2,q:"Scheduling problem: jobs A, B, C arrive at time 0 with burst times 24, 3, 3 ms. Compute the average waiting time under (a) FCFS in order A, B, C and (b) Shortest Job First. What does this demonstrate?",
+h1:"Waiting time = start time (here, since all arrive at 0 and run to completion).",
+h2:"FCFS: A waits 0, B waits 24, C waits 27. Redo with order B, C, A.",
+a:"(a) FCFS (A,B,C): waits are 0, 24, 27 &rarr; average 17 ms. (b) SJF runs B, C, A: waits 0, 3, 6 &rarr; average 3 ms. SJF provably minimizes average waiting time (exchange argument: running a shorter job before a longer one never increases total waiting). The catch: burst lengths are not known in advance (they must be predicted, e.g. exponential averaging), and long jobs can starve under a continual stream of short ones."},
+{t:"os",d:2,q:"What is the producer-consumer problem, and how is it solved with semaphores? Explain the role of each semaphore and why operation order matters.",
+h1:"A bounded buffer sits between producers and consumers.",
+h2:"You need counting semaphores empty and full, plus a mutex. What deadlock arises if a producer takes the mutex before waiting on empty?",
+a:"Producers put items into a bounded buffer; consumers remove them; neither may overrun or underrun the buffer, and buffer access must be mutually exclusive. Use empty = N (free slots), full = 0 (filled slots), mutex = 1. Producer: wait(empty); wait(mutex); insert; signal(mutex); signal(full). Consumer: wait(full); wait(mutex); remove; signal(mutex); signal(empty). Order matters: if the producer takes the mutex first and then blocks on empty (buffer full), the consumer can never acquire the mutex to free a slot &mdash; deadlock."},
+{t:"os",d:3,q:"Explain the difference between a mutex, a semaphore, and a condition variable, and when each is the right tool.",
+h1:"One is ownership-based locking; one is a counter; one is for waiting on a predicate.",
+h2:"Why must a condition variable always be used inside a loop re-checking the condition, together with a mutex?",
+a:"Mutex: binary lock with ownership &mdash; only the locker unlocks; protects critical sections. Semaphore: a counter with atomic wait/signal, no ownership; counting semaphores manage N identical resources or signal between threads (a binary semaphore can act as a signal, unlike a mutex). Condition variable: lets a thread sleep until a predicate over shared state holds; always paired with a mutex, and waits sit in a while loop re-checking the predicate &mdash; because of spurious wakeups and because the state may change between signal and wakeup (Mesa semantics). Rule of thumb: mutex for exclusion, condition variable for waiting on state, semaphore for counting/signaling."},
+{t:"os",d:3,q:"A memory access takes 100 ns. A page fault takes 8 ms to service. If the page fault rate is p, write the effective access time formula, and find the largest p keeping effective access time under 200 ns. What lesson does the answer teach?",
+h1:"Effective access time = (1 &minus; p)&middot;100 ns + p&middot;(fault cost).",
+h2:"Set (1&minus;p)&middot;100 + p&middot;8,000,000 &le; 200 and solve.",
+a:"EAT = (1 &minus; p)&middot;100 + p&middot;8&times;10<sup>6</sup> ns &asymp; 100 + p&middot;8&times;10<sup>6</sup>. Requiring &le; 200 ns: p&middot;8&times;10<sup>6</sup> &le; 100, so p &le; 1.25&times;10<sup>&minus;5</sup> &mdash; about one fault per 80,000 accesses. Lesson: disk service is ~5 orders of magnitude slower than RAM, so even a minuscule fault rate destroys performance; this is why locality, adequate RAM, and good replacement policies matter, and what makes thrashing so catastrophic."},
+{t:"os",d:3,q:"What is thrashing? What causes it, how can the OS detect it, and what are the remedies? Include the working-set concept in your answer.",
+h1:"The system pages constantly and does almost no useful work.",
+h2:"Compare each process&rsquo;s working set with available frames when too many processes run.",
+a:"Thrashing is when processes spend most of their time servicing page faults rather than executing, because the total memory actively needed exceeds physical RAM. Cause: over-committed multiprogramming &mdash; each process&rsquo;s working set (the pages referenced in a recent window, capturing its locality) does not fit, so every process continually steals frames from others. Symptoms: high fault rate, saturated disk, low CPU utilization &mdash; which can trick a naive scheduler into admitting even more processes. Remedies: working-set or page-fault-frequency policies that suspend/swap out processes until resident working sets fit, or adding RAM."},
+{t:"os",d:3,q:"Explain how fork() and exec() work in Unix and why they are separate calls. What does copy-on-write contribute?",
+h1:"fork duplicates the calling process; exec replaces its program image.",
+h2:"What useful work can the child do between fork and exec? And why would physically copying the whole address space at fork be wasteful?",
+a:"fork() creates a child that is a near-identical copy of the parent (same code, data, open files); it returns 0 in the child and the child&rsquo;s PID in the parent. exec() replaces the current process image with a new program, keeping the PID and (by default) open descriptors. Separating them lets the child customize its environment between the calls &mdash; redirect I/O, set up pipes, drop privileges &mdash; which is exactly how shells implement redirection and pipelines. Copy-on-write makes fork cheap: parent and child share physical pages marked read-only, and a page is copied only when either writes it &mdash; so fork+exec does not copy an address space that is about to be thrown away."},
+{t:"os",d:3,q:"Compare contiguous allocation, linked allocation, and indexed allocation (inodes) for file data blocks. How do Unix inodes handle very large files?",
+h1:"Consider random access, fragmentation, and per-file overhead for each scheme.",
+h2:"Inodes use direct pointers plus single, double, and triple indirect blocks.",
+a:"Contiguous: file occupies consecutive blocks &mdash; fast sequential and random access, but external fragmentation and difficult growth. Linked: each block points to the next &mdash; no external fragmentation, but random access is O(n) and a lost pointer corrupts the chain (FAT moves pointers into a table, helping). Indexed: an index node lists the block addresses &mdash; efficient random access, no external fragmentation. Unix inodes hold ~12 direct pointers, then a single-indirect block (pointers to data blocks), then double- and triple-indirect. With 4 KB blocks and 4-byte pointers, each indirection multiplies capacity by 1024, reaching terabytes while keeping small files cheap &mdash; matching the reality that most files are small."},
+{t:"os",d:3,q:"What is the difference between user mode and kernel mode, and what is a system call? Trace what happens, step by step, when a program calls read().",
+h1:"The CPU has privilege levels enforced in hardware.",
+h2:"The transition happens via a trap instruction, not an ordinary function call.",
+a:"The CPU runs applications in user mode, where privileged instructions and direct hardware/memory access are forbidden; the kernel runs in kernel mode with full access. A system call is the controlled gateway: read() in libc places the syscall number and arguments in registers and executes a trap instruction; the CPU switches to kernel mode and jumps to the kernel&rsquo;s syscall entry point (not to an arbitrary address &mdash; that is the security guarantee); the kernel validates arguments (e.g. the user buffer pointer), performs the I/O &mdash; possibly blocking the process until the data arrives &mdash; copies data into the user buffer, and returns to user mode with the result. This boundary is what makes OS protection real, and also why syscalls cost far more than function calls."},
+{t:"os",d:3,q:"Two threads run: T1 does lock(A); lock(B); ... and T2 does lock(B); lock(A); .... Explain precisely how deadlock can occur, and give two different fixes.",
+h1:"Consider the interleaving where each thread acquires its first lock before either takes its second.",
+h2:"One fix changes the order of acquisition; the other abandons waiting forever.",
+a:"Interleaving: T1 takes A; T2 takes B; now T1 blocks waiting for B (held by T2) and T2 blocks waiting for A (held by T1) &mdash; a circular wait with hold-and-wait, no preemption, and mutual exclusion: deadlock. Fix 1 (lock ordering): impose a global order, e.g. always acquire A before B; then a thread holding B can never wait for A, so no cycle can form. Fix 2 (no indefinite wait): use trylock &mdash; if the second lock is unavailable, release the first and retry (ideally with randomized backoff to avoid livelock). Other options: acquire both atomically under a single outer lock, or use deadlock detection and recovery."},
+/*__QUESTIONS__*/
+];
+
+let topicSel = "all", diffSel = 0, order = [], idx = 0;
+const scores = {}; // qIndex -> 0/1/2
+let studentName = "";
+try{ studentName = localStorage.getItem("kaustName") || ""; }catch(e){}
+
+const CHEERS = {
+  2:["Excellent, NAME! That is exactly the level of answer KAUST interviewers want.",
+     "Nailed it, NAME. Keep this up and the interview will feel easy.",
+     "Perfect, NAME! Explaining your reasoning like that is what earns top marks.",
+     "Outstanding work, NAME &mdash; that was an interview-quality answer.",
+     "Great job, NAME! Your preparation is clearly paying off."],
+  1:["Good progress, NAME &mdash; you had the right idea. Reread the model answer and it will stick.",
+     "Almost there, NAME! Partial credit counts in interviews too &mdash; now close the gap.",
+     "Nice effort, NAME. You got the core; polish the details and this one is yours.",
+     "You are on the right track, NAME &mdash; one more pass and you will have it fully."],
+  0:["No worries, NAME &mdash; missed questions teach the most. Study the model answer and revisit it later.",
+     "That was a tough one, NAME. Understanding why is more valuable than getting it right first try.",
+     "Keep going, NAME &mdash; every expert missed these once. Shuffle it back in later and beat it.",
+     "Do not be discouraged, NAME &mdash; spotting a gap now is exactly why you are practicing."]
+};
+const MILESTONES = {10:"NAME, 10 questions done &mdash; great momentum!",
+  25:"A quarter of the way, NAME. Consistency wins interviews!",
+  50:"Halfway there, NAME! Check your progress report and focus on your weakest topic.",
+  75:"75 down, NAME &mdash; you are seriously prepared now.",
+  100:"All 100 questions, NAME! You are ready. Rest well before the interview &mdash; you have earned it."};
+
+function cheerFor(g){
+  const pool = CHEERS[g];
+  let msg = pool[Math.floor(Math.random()*pool.length)];
+  const n = Object.keys(scores).length;
+  if(MILESTONES[n]) msg += "<br><b>" + MILESTONES[n] + "</b>";
+  const c = el("cheer");
+  c.innerHTML = msg.split("NAME").join(studentName || "champion");
+  c.classList.add("show");
+}
+
+function pool(){
+  let p = QUESTIONS.map((q,i)=>i);
+  if(topicSel!=="all") p = p.filter(i=>QUESTIONS[i].t===topicSel);
+  if(diffSel!==0) p = p.filter(i=>QUESTIONS[i].d===diffSel);
+  return p;
+}
+function rebuild(shuffle){
+  order = pool();
+  if(shuffle){ for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];} }
+  idx = 0; render();
+}
+function el(id){return document.getElementById(id);}
+function render(){
+  el("total").textContent = order.length;
+  if(order.length===0){ el("qText").innerHTML="<i>No questions match this filter.</i>"; el("pos").textContent=0; return; }
+  const q = QUESTIONS[order[idx]];
+  el("pos").textContent = idx+1;
+  el("tTopic").textContent = TOPICS[q.t];
+  const td = el("tDiff"); td.textContent = DIFFS[q.d]; td.className = "tag d"+q.d;
+  el("qText").innerHTML = q.q;
+  el("h1Text").innerHTML = q.h1; el("h2Text").innerHTML = q.h2; el("ansText").innerHTML = q.a;
+  ["h1Box","h2Box","ansBox"].forEach(b=>el(b).classList.remove("show"));
+  el("h1Btn").disabled=false; el("h2Btn").disabled=true; el("ansBtn").disabled=false;
+  el("gradeRow").classList.remove("show");
+  el("cheer").classList.remove("show");
+  document.querySelectorAll(".grade button").forEach(b=>b.classList.remove("picked"));
+  const g = scores[order[idx]];
+  if(g!==undefined){
+    el("gradeRow").classList.add("show");
+    document.querySelectorAll(".grade button").forEach(b=>{ if(+b.dataset.g===g) b.classList.add("picked"); });
+  }
+  el("prevBtn").disabled = idx===0;
+  el("nextBtn").disabled = idx>=order.length-1;
+  window.scrollTo({top:0});
+}
+el("h1Btn").onclick = ()=>{ el("h1Box").classList.add("show"); el("h1Btn").disabled=true; el("h2Btn").disabled=false; };
+el("h2Btn").onclick = ()=>{ el("h2Box").classList.add("show"); el("h2Btn").disabled=true; };
+el("ansBtn").onclick = ()=>{ el("ansBox").classList.add("show"); el("ansBtn").disabled=true; el("gradeRow").classList.add("show"); };
+document.querySelectorAll(".grade button").forEach(b=>{
+  b.onclick = ()=>{ scores[order[idx]] = +b.dataset.g;
+    document.querySelectorAll(".grade button").forEach(x=>x.classList.remove("picked"));
+    b.classList.add("picked"); cheerFor(+b.dataset.g); };
+});
+el("prevBtn").onclick = ()=>{ if(idx>0){idx--; render();} };
+el("nextBtn").onclick = ()=>{ if(idx<order.length-1){idx++; render();} };
+el("shuffleBtn").onclick = ()=>rebuild(true);
+el("reportBtn").onclick = ()=>{
+  const r = el("report");
+  if(r.classList.contains("show")){ r.classList.remove("show"); return; }
+  let html = "<div class='lbl' style='font-family:Helvetica,Arial,sans-serif;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:8px;'>Progress report</div><table><tr><th>Topic</th><th>Attempted</th><th>Score</th></tr>";
+  let tot=0, got=0;
+  for(const t in TOPICS){
+    let a=0, s=0;
+    QUESTIONS.forEach((q,i)=>{ if(q.t===t && scores[i]!==undefined){ a++; s+=scores[i]; } });
+    tot+=a*2; got+=s;
+    html += "<tr><td>"+TOPICS[t]+"</td><td>"+a+" / 20</td><td>"+(a? Math.round(50*s/a)+"%":"&mdash;")+"</td></tr>";
+  }
+  html += "<tr><th>Overall</th><th>"+Object.keys(scores).length+" / "+QUESTIONS.length+"</th><th>"+(tot? Math.round(100*got/tot)+"%":"&mdash;")+"</th></tr></table>";
+  if(tot){
+    const pct = Math.round(100*got/tot);
+    let note = pct >= 80 ? "you are performing at a very strong level. Keep sharpening your weakest topic and you will walk in confident."
+      : pct >= 55 ? "solid foundation! Focus your next sessions on the topics with the lowest scores above."
+      : "good start &mdash; real progress comes from reviewing every model answer you missed. Keep at it!";
+    html2 = "<p style='margin-top:10px;font-family:Helvetica,Arial,sans-serif;font-size:.9rem;color:var(--accent);'><b>" + (studentName||"Champion") + "</b>, " + note + "</p>";
+    html += html2;
+  }
+  r.innerHTML = html; r.classList.add("show");
+};
+function makeFilters(){
+  const tf = el("topicFilters");
+  const mk = (label,val,sel,cb)=>{ const b=document.createElement("button"); b.textContent=label;
+    if(val===sel) b.classList.add("on"); b.onclick=()=>cb(val); return b; };
+  const setTopic = v=>{ topicSel=v; makeFilters(); rebuild(false); };
+  const setDiff = v=>{ diffSel=v; makeFilters(); rebuild(false); };
+  tf.innerHTML=""; tf.appendChild(mk("All topics","all",topicSel,setTopic));
+  for(const t in TOPICS) tf.appendChild(mk(TOPICS[t],t,topicSel,setTopic));
+  const df = el("diffFilters"); df.innerHTML="";
+  df.appendChild(mk("All levels",0,diffSel,setDiff));
+  for(const d in DIFFS) df.appendChild(mk(DIFFS[d],+d,diffSel,setDiff));
+}
+function applyName(){
+  if(studentName) el("subtitle").innerHTML = "Good luck, <b>" + studentName + "</b>! &middot; 100 questions across 5 topics";
+}
+el("startBtn").onclick = ()=>{
+  const v = el("nameInput").value.trim().replace(/[<>&]/g,"");
+  if(v){ studentName = v; try{ localStorage.setItem("kaustName", v); }catch(e){} }
+  applyName();
+  el("welcome").classList.add("hide");
+};
+el("nameInput").addEventListener("keydown", e=>{ if(e.key==="Enter") el("startBtn").click(); });
+if(studentName){ el("nameInput").value = studentName; }
+applyName();
+makeFilters(); rebuild(false);
+</script>
+</body>
+</html>
