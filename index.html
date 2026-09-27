@@ -95,13 +95,13 @@
 <body>
 <header>
   <h1>KAUST Master&rsquo;s Interview Practice</h1>
-  <p id="subtitle">100 questions &middot; Calculus &middot; Linear Algebra &middot; Probability &middot; Data Structures &amp; Algorithms &middot; Operating Systems</p>
+  <p id="subtitle">116 questions &middot; Calculus &middot; Linear Algebra &middot; Probability &middot; Data Structures &amp; Algorithms &middot; Operating Systems &middot; Programming</p>
 </header>
 <div id="welcome">
   <div class="wcard">
     <h2>Welcome, FCIT Champion!</h2>
     <p>Great engineers aren&rsquo;t born, they&rsquo;re built through practice.<br><br>
-    Challenge yourself with 100 carefully selected KAUST-style questions covering Calculus, Linear Algebra, Probability, Algorithms, and Operating Systems.</p>
+    Challenge yourself with 116 carefully selected KAUST-style questions covering Calculus, Linear Algebra, Probability, Algorithms, Operating Systems, and Programming &mdash; including <b style="color:#b8860b">&#9733; real past interview questions</b>.</p>
     <input id="nameInput" type="text" placeholder="Your name" maxlength="30">
     <br><button id="startBtn">Let&rsquo;s get started!</button>
   </div>
@@ -136,7 +136,8 @@
   <div class="foot">Work each problem on paper before choosing an answer &mdash; in the real interview you must explain your reasoning aloud.</div>
 </div>
 <script>
-const TOPICS = {calc:"Calculus", la:"Linear Algebra", prob:"Probability", dsa:"Data Structures & Algorithms", os:"Operating Systems"};
+const TOPICS = {calc:"Calculus", la:"Linear Algebra", prob:"Probability", dsa:"Data Structures & Algorithms", os:"Operating Systems", prog:"Programming"};
+const STAR = "<b style='color:#b8860b'>&#9733; Past interview question.</b> ";
 const DIFFS = {1:"Easy", 2:"Medium", 3:"Hard"};
 const QUESTIONS = [
 // ---------- CALCULUS ----------
@@ -544,6 +545,88 @@ a:"The CPU runs applications in user mode, where privileged instructions and dir
 h1:"Consider the interleaving where each thread acquires its first lock before either takes its second.",
 h2:"One fix changes the order of acquisition; the other abandons waiting forever.",
 a:"Interleaving: T1 takes A; T2 takes B; now T1 blocks waiting for B (held by T2) and T2 blocks waiting for A (held by T1) &mdash; a circular wait with hold-and-wait, no preemption, and mutual exclusion: deadlock. Fix 1 (lock ordering): impose a global order, e.g. always acquire A before B; then a thread holding B can never wait for A, so no cycle can form. Fix 2 (no indefinite wait): use trylock &mdash; if the second lock is unavailable, release the first and retry (ideally with randomized backoff to avoid livelock). Other options: acquire both atomically under a single outer lock, or use deadlock detection and recovery."},
+// ---------- REAL PAST QUESTIONS (from the actual KAUST interview bank) ----------
+{t:"calc",d:2,q:"&#9733;REAL&#9733; f(x, y) = 3x&sup3; + 3y&sup2; &minus; 3x + 6. Find the local minimum.",
+h1:"Set both partial derivatives to zero: f<sub>x</sub> = 9x&sup2; &minus; 3, f<sub>y</sub> = 6y.",
+h2:"Critical points at x = &plusmn;1/&radic;3, y = 0. Use the Hessian: f<sub>xx</sub> = 18x, f<sub>yy</sub> = 6, f<sub>xy</sub> = 0.",
+a:"f<sub>x</sub> = 9x&sup2; &minus; 3 = 0 gives x = &plusmn;1/&radic;3; f<sub>y</sub> = 6y = 0 gives y = 0. Hessian: D = f<sub>xx</sub>f<sub>yy</sub> = 108x. At (1/&radic;3, 0): D &gt; 0 and f<sub>xx</sub> &gt; 0 &rarr; local minimum, value 6 &minus; 2/&radic;3 &asymp; 4.85. At (&minus;1/&radic;3, 0): D &lt; 0 &rarr; saddle point.",
+c:["Local minimum at (1/&radic;3, 0); the other critical point (&minus;1/&radic;3, 0) is a saddle","Local minimum at (&minus;1/&radic;3, 0)","Local minimum at (0, 0)"],k:0},
+{t:"calc",d:2,q:"&#9733;REAL&#9733; Evaluate the limit of f(x, y) = xy / (x&sup2; + y&sup2;) as (x, y) &rarr; (0, 0). Does it exist?",
+h1:"Try approaching the origin along different straight lines.",
+h2:"Along y = 0 the function is 0; along y = x it is x&sup2;/2x&sup2;.",
+a:"Along the x-axis (y = 0): f = 0 everywhere, so the limit along that path is 0. Along y = x: f = x&sup2;/(2x&sup2;) = 1/2. Two paths give different values, so the limit does not exist. Key idea: in two variables, a limit must agree along every path &mdash; checking one path can only disprove, never prove, existence.",
+c:["The limit does not exist: 0 along y = 0 but 1/2 along y = x","The limit is 0 by continuity","The limit is 1/2"],k:0},
+{t:"la",d:1,q:"&#9733;REAL&#9733; By inspection (no long computation), find the inverse of the diagonal matrix diag(2, &minus;5, 1).",
+h1:"What does a diagonal matrix do to each coordinate?",
+h2:"Invert each diagonal entry individually.",
+a:"A diagonal matrix scales each axis independently, so its inverse simply inverts each diagonal entry: diag(1/2, &minus;1/5, 1). This works iff no diagonal entry is 0 (a zero entry would make the matrix singular). Check: diag(2,&minus;5,1)&middot;diag(1/2,&minus;1/5,1) = I.",
+c:["diag(1/2, &minus;1/5, 1)","diag(&minus;2, 5, &minus;1)","diag(1/2, 1/5, 1)"],k:0},
+{t:"la",d:2,q:"&#9733;REAL&#9733; Solve the system: x + 2y &minus; z = 4; &nbsp; 2x &minus; y + 3z = 1; &nbsp; 3x + y + 2z = 10.",
+h1:"Eliminate x: compute R2 &minus; 2R1 and R3 &minus; 3R1.",
+h2:"Both give the same left side &minus;5y + 5z &mdash; compare the right sides.",
+a:"R2 &minus; 2R1: &minus;5y + 5z = &minus;7. R3 &minus; 3R1: &minus;5y + 5z = &minus;2. The same combination of variables equals two different numbers &mdash; a contradiction, so the system has no solution (it is inconsistent). Consistently, det of the coefficient matrix is 0. Lesson: det = 0 means no unique solution; whether it is none or infinitely many depends on the right-hand side.",
+c:["No solution &mdash; elimination gives &minus;5y + 5z = &minus;7 and = &minus;2, a contradiction (det = 0)","Unique solution (1, 2, 1)","Infinitely many solutions along a line"],k:0},
+{t:"prob",d:2,q:"&#9733;REAL&#9733; A box has 7 red, 8 black, and 5 blue balls. Three are drawn without replacement. What is the probability of exactly 2 red and 1 black (any order)?",
+h1:"Count favorable combinations over total combinations of 3 from 20.",
+h2:"C(7,2)&middot;C(8,1) favorable; C(20,3) total.",
+a:"P = C(7,2)&middot;C(8,1) / C(20,3) = 21&middot;8 / 1140 = 168/1140 = 14/95 &asymp; 0.147. Using combinations automatically handles all orderings; the equivalent sequential computation would sum the probabilities of RRB, RBR, BRR.",
+c:["14/95 &asymp; 0.147","21/190 &asymp; 0.11","7/95 &asymp; 0.074"],k:0},
+{t:"dsa",d:2,q:"&#9733;REAL&#9733; Insert 50, 36, 72, 54, 67, 100, 59, 102 (in this order) into an empty BST. Which statement describes the resulting tree?",
+h1:"Insert one by one: each key goes left if smaller, right if larger, until it finds an empty spot.",
+h2:"Follow 59: 59 &gt; 50, 59 &lt; 72, 59 &gt; 54, 59 &lt; 67 &rarr; where does it land?",
+a:"Root 50; 36 left of 50; 72 right of 50; 54 left of 72; 67 right of 54; 100 right of 72; 59 left of 67; 102 right of 100. So 59 is the left child of 67 and 102 the right child of 100. The height (edges) along 50&rarr;72&rarr;54&rarr;67&rarr;59 is 4. Sorted insertion order would have produced a degenerate chain &mdash; balance depends on insertion order.",
+c:["59 is the left child of 67, and 102 the right child of 100","59 is the right child of 54, and 102 the left child of 100","The tree is perfectly balanced with height 3"],k:0},
+{t:"os",d:2,q:"&#9733;REAL&#9733; A system has a logical address space of 64 pages (page size 1024 KB) mapped onto 32 physical frames. How many bits for the logical and physical addresses?",
+h1:"Address bits = bits for page/frame number + bits for the offset within a page.",
+h2:"64 = 2<sup>6</sup> pages, 32 = 2<sup>5</sup> frames, 1024 KB = 2<sup>20</sup> bytes offset.",
+a:"Offset: 1024 KB = 2<sup>20</sup> bytes &rarr; 20 bits. Logical: 6 bits page number (2<sup>6</sup> = 64) + 20 = 26 bits. Physical: 5 bits frame number (2<sup>5</sup> = 32) + 20 = 25 bits. To translate: split the logical address into (page, offset), look up the frame for that page in the page table, and concatenate frame number with the unchanged offset.",
+c:["Logical 26 bits, physical 25 bits","Logical 64 bits, physical 32 bits","Logical 20 bits, physical 20 bits"],k:0},
+{t:"os",d:1,q:"&#9733;REAL&#9733; One process executes: fork(); fork(); fork(); How many processes exist in total at the end?",
+h1:"Each fork() doubles the number of processes, because every existing process executes it.",
+h2:"1 &rarr; 2 &rarr; 4 &rarr; ?",
+a:"Each fork() is executed by every process alive at that point, doubling the count: 1 &rarr; 2 &rarr; 4 &rarr; 8. In general n sequential forks produce 2<sup>n</sup> processes (7 children created here). This is why runaway forks (fork bombs) exhaust a system so fast.",
+c:["8 (2&sup3; &mdash; each fork doubles the count)","4 (one per fork plus the parent)","6 (3 forks &times; 2)"],k:0},
+// ---------- PROGRAMMING ----------
+{t:"prog",d:2,q:"&#9733;REAL&#9733; Point (x<sub>i</sub>, y<sub>i</sub>) is dominated by (x<sub>j</sub>, y<sub>j</sub>) if x<sub>i</sub> &le; x<sub>j</sub> and y<sub>i</sub> &le; y<sub>j</sub> with at least one strict. An extreme point is dominated by no other. For the set {(4.5,1.2), (5.1,&minus;4.2), (2.1,8.6), (&minus;6.3,15.2), (1.5,5.2), (3.4,1.8), (3.4,4.2), (&minus;8.1,3.2), (4.5,7.9), (9.8,&minus;2.3)}, which are the extreme points?",
+h1:"A point survives only if no other point is at least as large in both coordinates.",
+h2:"Check candidates with the largest x or largest y first: (9.8, &minus;2.3) and (&minus;6.3, 15.2) are safe. Who else survives?",
+a:"Extreme points: {(2.1, 8.6), (&minus;6.3, 15.2), (4.5, 7.9), (9.8, &minus;2.3)}. Examples of elimination: (4.5, 1.2) is dominated by (4.5, 7.9); (1.5, 5.2) by (2.1, 8.6); (3.4, 1.8) by (3.4, 4.2), which is itself dominated by (4.5, 7.9); (&minus;8.1, 3.2) by (&minus;6.3, 15.2); (5.1, &minus;4.2) by (9.8, &minus;2.3). The survivors form a &lsquo;staircase&rsquo;: as x decreases, y must strictly increase.",
+c:["{(2.1, 8.6), (&minus;6.3, 15.2), (4.5, 7.9), (9.8, &minus;2.3)}","{(9.8, &minus;2.3), (&minus;6.3, 15.2)} only","{(4.5, 7.9), (9.8, &minus;2.3), (5.1, &minus;4.2), (2.1, 8.6)}"],k:0},
+{t:"prog",d:3,q:"Design an efficient algorithm for the extreme-points problem on n points. What is the best approach and complexity?",
+h1:"The brute force compares every pair. Can sorting help you scan just once?",
+h2:"Sort by x descending. While scanning, when is the current point NOT dominated by anything already seen?",
+a:"Sort points by x descending (ties: y descending) &mdash; O(n log n). Scan left to right keeping maxY of the points seen so far (all of which have larger-or-equal x): the current point is extreme iff its y is strictly greater than maxY. One O(n) pass after sorting gives O(n log n) total, versus O(n&sup2;) for the all-pairs check. This staircase/skyline pattern (sort one dimension, sweep the other) recurs in many interview problems.",
+c:["Sort by x descending, sweep once tracking max y: O(n log n)","All-pairs dominance check is optimal: O(n&sup2;) cannot be beaten","Sort by y ascending and return the last k points: O(n)"],k:0},
+{t:"prog",d:2,q:"Write the brute-force version of the extreme-points program: two nested loops checking every point against every other. What is its time complexity?",
+h1:"For each of the n points, how many comparisons do you make?",
+h2:"n points, each checked against n &minus; 1 others.",
+a:"For each point, scan all others to see whether some point dominates it: n(n&minus;1) comparisons &rarr; O(n&sup2;). Correct and simple &mdash; a fine first answer in an interview &mdash; but you should immediately mention the O(n log n) sort-and-sweep improvement when asked to optimize.",
+c:["O(n&sup2;)","O(n log n)","O(n)"],k:0},
+{t:"prog",d:1,q:"What is the value of s after this loop? <code>s = 0; for (i = 1; i &le; 5; i++) s += i;</code>",
+h1:"Trace it: s grows by 1, then 2, then 3&hellip;",
+h2:"1 + 2 + 3 + 4 + 5.",
+a:"s = 1 + 2 + 3 + 4 + 5 = 15. In general summing 1..n gives n(n+1)/2 &mdash; a formula worth quoting in interviews to show you think beyond the loop.",
+c:["15","10","20"],k:0},
+{t:"prog",d:1,q:"What does f(4) return? <code>f(n) { if (n &le; 1) return 1; return n * f(n &minus; 1); }</code>",
+h1:"Unfold the recursion one level at a time.",
+h2:"f(4) = 4 &middot; f(3) = 4 &middot; 3 &middot; f(2) = &hellip;",
+a:"f(4) = 4&middot;3&middot;2&middot;f(1) = 4&middot;3&middot;2&middot;1 = 24 &mdash; the factorial function. Base case n &le; 1 returns 1; each level multiplies by n. Recursion depth is n, so it is O(n) time and O(n) stack space.",
+c:["24","12","6"],k:0},
+{t:"prog",d:2,q:"What is the time complexity of: <code>for (i = 0; i &lt; n; i++) for (j = 0; j &lt; i; j++) work();</code>",
+h1:"The inner loop runs 0, then 1, then 2, &hellip; times.",
+h2:"Sum 0 + 1 + &hellip; + (n&minus;1).",
+a:"Total inner iterations: 0 + 1 + &hellip; + (n&minus;1) = n(n&minus;1)/2 &asymp; n&sup2;/2 &rarr; O(n&sup2;). The triangular shape does not change the asymptotic class &mdash; constants are dropped in Big-O. A common interview trap is answering O(n log n) because the inner loop is &lsquo;shorter&rsquo;.",
+c:["O(n&sup2;)","O(n log n)","O(n)"],k:0},
+{t:"prog",d:2,q:"An array a has n elements (indices 0 to n&minus;1). What is wrong with: <code>for (i = 0; i &le; n; i++) print(a[i]);</code>",
+h1:"Count how many iterations the loop makes.",
+h2:"What happens at i = n?",
+a:"The condition i &le; n runs the loop n+1 times, and at i = n it accesses a[n], one past the last valid index (n&minus;1) &mdash; an off-by-one error causing out-of-bounds access (crash, garbage, or in C, undefined behavior). The fix is i &lt; n. Off-by-one errors at loop boundaries are the most common bug interviewers probe for.",
+c:["a[n] is accessed &mdash; out of bounds; the condition must be i &lt; n","Nothing &mdash; arrays grow automatically","The loop never terminates"],k:0},
+{t:"prog",d:1,q:"Which snippet correctly reverses an array in place?",
+h1:"Two indices moving toward each other.",
+h2:"Swap ends, then move both inward; stop when they meet.",
+a:"The two-pointer pattern: i = 0, j = n&minus;1; while (i &lt; j) { swap(a[i], a[j]); i++; j&minus;&minus;; } &mdash; O(n) time, O(1) extra space. Looping i over the whole array while swapping a[i] with a[n&minus;1&minus;i] reverses twice (returning the original), and copying to a new array is not in place.",
+c:["i = 0, j = n&minus;1; while (i &lt; j) { swap(a[i], a[j]); i++; j&minus;&minus;; }","for (i = 0; i &lt; n; i++) swap(a[i], a[n&minus;1&minus;i]);","Copy the array backwards into a new array"],k:0},
 ];
 // One entry per question, same order. o = 3 options, k = index of correct option (display order is shuffled).
 const CHOICES = [
@@ -653,7 +736,7 @@ const CHOICES = [
 {o:["A trap switches to kernel mode at a fixed entry point; the kernel validates and performs the I/O","An ordinary function call into a kernel library","The kernel runs in user mode for safety"],k:0},
 {o:["T1 holds A wanting B while T2 holds B wanting A; fix with a global lock order or trylock","Deadlock is impossible with only two locks","It is fixed by adding a third lock"],k:0}
 ];
-QUESTIONS.forEach((q,i)=>{ q.c = CHOICES[i].o; q.k = CHOICES[i].k; });
+QUESTIONS.forEach((q,i)=>{ if(!q.c && CHOICES[i]){ q.c = CHOICES[i].o; q.k = CHOICES[i].k; } });
 
 let topicSel = "all", diffSel = 0, order = [], idx = 0;
 const scores = {}; // qIndex -> 0/2
@@ -771,10 +854,10 @@ el("reportBtn").onclick = ()=>{
   let html = "<div class='lbl' style='font-family:Helvetica,Arial,sans-serif;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:8px;'>Progress report</div><table><tr><th>Topic</th><th>Attempted</th><th>Score</th></tr>";
   let tot=0, got=0;
   for(const t in TOPICS){
-    let a=0, s=0;
-    QUESTIONS.forEach((q,i)=>{ if(q.t===t && scores[i]!==undefined){ a++; s+=scores[i]; } });
+    let a=0, s=0, n=0;
+    QUESTIONS.forEach((q,i)=>{ if(q.t===t){ n++; if(scores[i]!==undefined){ a++; s+=scores[i]; } } });
     tot+=a*2; got+=s;
-    html += "<tr><td>"+TOPICS[t]+"</td><td>"+a+" / 20</td><td>"+(a? Math.round(50*s/a)+"%":"&mdash;")+"</td></tr>";
+    html += "<tr><td>"+TOPICS[t]+"</td><td>"+a+" / "+n+"</td><td>"+(a? Math.round(50*s/a)+"%":"&mdash;")+"</td></tr>";
   }
   html += "<tr><th>Overall</th><th>"+Object.keys(scores).length+" / "+QUESTIONS.length+"</th><th>"+(tot? Math.round(100*got/tot)+"%":"&mdash;")+"</th></tr></table>";
   if(tot){
@@ -800,7 +883,7 @@ function makeFilters(){
   for(const d in DIFFS) df.appendChild(mk(DIFFS[d],+d,diffSel,setDiff));
 }
 function applyName(){
-  if(studentName) el("subtitle").innerHTML = "Good luck, <b>" + studentName + "</b>! &middot; 100 questions across 5 topics";
+  if(studentName) el("subtitle").innerHTML = "Good luck, <b>" + studentName + "</b>! &middot; 116 questions across 6 topics &middot; &#9733; = real past interview question";
 }
 el("startBtn").onclick = ()=>{
   const v = el("nameInput").value.trim().replace(/[<>&]/g,"");
